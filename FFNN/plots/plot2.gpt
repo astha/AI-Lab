@@ -1,0 +1,10 @@
+set term png
+set output 'eta_variation.png'
+set title "variation of num steps with eta"
+
+set datafile separator ' '
+
+set xlabel 'eta'
+set ylabel 'num steps'
+
+plot "etaVariance_xor_with_mf_0.2" using 1:2 with points title 'mf = 0.2', "etaVariance_xor_with_mf_0.5" using 1:2 with points title 'mf = 0.5' , "etaVariance_xor_with_mf_0.8" using 1:2 with points title 'mf = 0.8'

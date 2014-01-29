@@ -1,0 +1,10 @@
+set term png
+set output 'mf_variation.png'
+set title "variation of num steps with mf"
+
+set datafile separator ' '
+
+set xlabel 'mf'
+set ylabel 'num steps'
+
+plot "mfVariance_xor_with_eta_0.2" using 1:2 with points title 'eta = 0.2', "mfVariance_xor_with_eta_0.5" using 1:2 with points title 'eta = 0.5' , "mfVariance_xor_with_eta_0.8" using 1:2 with points title 'eta = 0.8'

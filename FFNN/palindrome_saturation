@@ -1,0 +1,224 @@
+0
+
+
+input -> 0 0 0 0 0 
+Expected Output 0 
+0 0 0 0 0 1 
+3.96935e-08 1 
+
+
+
+input -> 0 0 0 0 1 
+Expected Output 0 
+0 0 0 0 1 1 
+3.71142e-05 1 
+
+
+
+input -> 0 0 0 1 0 
+Expected Output 0 
+0 0 0 1 0 1 
+3.7121e-05 1 
+
+
+
+input -> 0 0 0 1 1 
+Expected Output 0 
+0 0 0 1 1 1 
+0.0335471 1 
+
+
+
+input -> 0 0 1 0 0 
+Expected Output 0 
+0 0 1 0 0 1 
+3.71352e-05 1 
+
+
+
+input -> 0 0 1 0 1 
+Expected Output 0 
+0 0 1 0 1 1 
+0.0335594 1 
+
+
+
+input -> 0 0 1 1 0 
+Expected Output 0 
+0 0 1 1 0 1 
+0.0335654 1 
+
+
+
+input -> 0 0 1 1 1 
+Expected Output 1 
+0 0 1 1 1 1 
+0.970127 1 
+
+
+
+input -> 0 1 0 0 0 
+Expected Output 0 
+0 1 0 0 0 1 
+3.71554e-05 1 
+
+
+
+input -> 0 1 0 0 1 
+Expected Output 0 
+0 1 0 0 1 1 
+0.0335771 1 
+
+
+
+input -> 0 1 0 1 0 
+Expected Output 0 
+0 1 0 1 0 1 
+0.033583 1 
+
+
+
+input -> 0 1 0 1 1 
+Expected Output 1 
+0 1 0 1 1 1 
+0.970143 1 
+
+
+
+input -> 0 1 1 0 0 
+Expected Output 0 
+0 1 1 0 0 1 
+0.0335954 1 
+
+
+
+input -> 0 1 1 0 1 
+Expected Output 1 
+0 1 1 0 1 1 
+0.970154 1 
+
+
+
+input -> 0 1 1 1 0 
+Expected Output 1 
+0 1 1 1 0 1 
+0.97016 1 
+
+
+
+input -> 0 1 1 1 1 
+Expected Output 1 
+0 1 1 1 1 1 
+0.999967 1 
+
+
+
+input -> 1 0 0 0 0 
+Expected Output 0 
+1 0 0 0 0 1 
+3.7176e-05 1 
+
+
+
+input -> 1 0 0 0 1 
+Expected Output 0 
+1 0 0 0 1 1 
+0.0335951 1 
+
+
+
+input -> 1 0 0 1 0 
+Expected Output 0 
+1 0 0 1 0 1 
+0.033601 1 
+
+
+
+input -> 1 0 0 1 1 
+Expected Output 1 
+1 0 0 1 1 1 
+0.970159 1 
+
+
+
+input -> 1 0 1 0 0 
+Expected Output 0 
+1 0 1 0 0 1 
+0.0336134 1 
+
+
+
+input -> 1 0 1 0 1 
+Expected Output 1 
+1 0 1 0 1 1 
+0.97017 1 
+
+
+
+input -> 1 0 1 1 0 
+Expected Output 1 
+1 0 1 1 0 1 
+0.970176 1 
+
+
+
+input -> 1 0 1 1 1 
+Expected Output 1 
+1 0 1 1 1 1 
+0.999967 1 
+
+
+
+input -> 1 1 0 0 0 
+Expected Output 0 
+1 1 0 0 0 1 
+0.0336311 1 
+
+
+
+input -> 1 1 0 0 1 
+Expected Output 1 
+1 1 0 0 1 1 
+0.970186 1 
+
+
+
+input -> 1 1 0 1 0 
+Expected Output 1 
+1 1 0 1 0 1 
+0.970191 1 
+
+
+
+input -> 1 1 0 1 1 
+Expected Output 1 
+1 1 0 1 1 1 
+0.999967 1 
+
+
+
+input -> 1 1 1 0 0 
+Expected Output 1 
+1 1 1 0 0 1 
+0.970202 1 
+
+
+
+input -> 1 1 1 0 1 
+Expected Output 1 
+1 1 1 0 1 1 
+0.999967 1 
+
+
+
+input -> 1 1 1 1 0 
+Expected Output 1 
+1 1 1 1 0 1 
+0.999967 1 
+
+
+
+input -> 1 1 1 1 1 
+Expected Output 1 
+1 1 1 1 1 1 
+1 1 

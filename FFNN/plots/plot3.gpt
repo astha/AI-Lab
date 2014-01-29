@@ -1,0 +1,10 @@
+set term png
+set output 'random_initialization.png'
+set title "variation of num steps with eta and mf"
+
+set datafile separator ' '
+
+set xlabel 'eta or mf'
+set ylabel 'num steps'
+
+plot "etaVariance_with_random_initialization_mf_0.5" using 1:2 with points title 'mf = 0.5', "mfVariance_with_random_initialization_eta_0.5" using 1:2 with points title 'eta = 0.5'
