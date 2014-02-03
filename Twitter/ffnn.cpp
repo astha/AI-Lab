@@ -23,7 +23,7 @@ private:
 	vector<double> outputWeights;
 	double delta;
 	vector<double> prevOutputWeights;
- public:
+public:
 	neuron();
 	neuron(int id, int layerId);
 	void initializeWeights(int nextLayerSize);
@@ -95,8 +95,8 @@ void neuron::initializeWeights(int nextLayerSize){
 	/*initializing all weights to 1*/
 	srand(time(NULL));
 	for(int i = 0 ; i<nextLayerSize; i++){
-		// outputWeights.push_back(double(rand())/INT_MAX);
-		outputWeights.push_back(i);
+		outputWeights.push_back(double(rand())/INT_MAX);
+		// outputWeights.push_back(i);
 		prevOutputWeights.push_back(0.0);
 	}
 }
@@ -154,19 +154,29 @@ void neuron::setDelta(double delta){
 
 neuronNetwork::neuronNetwork(vector<int> arrangement, int mode){
 	bpMode = mode;
+	mfbool = 0;
+	eta = 0.8;
 	Grid.clear();
 	int nextLayerSize;
+	cout << "YAHAN"  << endl;
 	for(int i =0 ; i<arrangement.size(); i++){
+		cout << "YAHAN1"  << endl;
 		Grid.push_back(vector<neuron>());
+		cout << "YAHAN2"  << endl;
 		/*one extra neuron to take care of theta which will always output 1*/
 		/*remember this adds one dummy neuron in the outermost layer as well*/
 		for(int j = 0 ; j<=arrangement[i]; j++){
+			cout << "YAHAN3"  << endl;
 			Grid.back().push_back(neuron(j,i));
+			cout << "YAHAN4"  << endl;
 			// cout<<"neuron created id = "<<j<<" and layer = "<<i<<endl;
 			Grid.back().back().initializeWeights(i == arrangement.size() ? 0 : arrangement[i+1]);
 		}
+		cout << "YAHAN5"  << endl;
 		Grid[i].back().setOutput(1);
+		cout << "YAHAN6"  << endl;
 	}
+	cout << "DONE" << endl;
 }
 
 void neuronNetwork::feedInput(vector<int> inp, vector<int> out){

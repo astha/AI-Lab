@@ -76,7 +76,7 @@ void readTweetFile(string filename , vector<int> output){
 		getline(fp, tweet);
 		
 		processTweet(tweet);
-		if (tweetCount%5!=0){
+		if (tweetCount%5==0){
 			testData.push_back(tweetVector);
 			testOutput.push_back(output);
 		}
@@ -100,16 +100,33 @@ vector<int> createInputVector(vector<string> in){
 }
 
 
-void trainData(){
+void printInput(){
 
+	for (int i = 0 ; i < trainingData.size(); i++){
+		vector<int> a = createInputVector(trainingData[i]);
+		for (int k = 0 ; k < trainingData[i].size() ; k++){
+			cout << trainingData[i][k] << " ";
+		}
+		cout << endl;
+		// cout << a.size() << endl;
+		for (int k = 0 ; k < a.size(); k++){
+			cout << a[k] << " ";
+		}
+		cout << endl;
+		cout << "YAHAN AAYA\n";
+	}
+	cout << "OUT" << endl;
+	
+}
+
+void trainData(){
+cout << "IN" << endl;
 	numInputs = wordCount;
 	numOutputs = 3;
 	arrangement = vector<int>{numInputs,wordCount/2, numOutputs};
-	cout<< "KYA!" << endl;
 	myNeuronGrid = neuronNetwork(arrangement, 0);
 
-	cout<< "KYA!" << endl;
-
+	cout << "FINAL" << endl;
 
 	threshold = 0.1;
 	for (int i = 0 ; i < trainingData.size(); i++){
@@ -117,12 +134,11 @@ void trainData(){
 
 	}
 
-	cout<< "KYA!" << endl;
 
 /*feed input and correct output*/
 	double totalError = 0;
 	lld numSteps = 0;
-	while(1 && numSteps<50000){
+	while(1 ){
 		totalError = 0;
 		cout << "HERE" << endl;
 		for(int i = 0 ; i<input.size(); i++){
@@ -131,11 +147,12 @@ void trainData(){
 			myNeuronGrid.propagateBackward();
 		}
 		numSteps += input.size();
-		// cout<<totalError<<endl;
+		cout<<totalError<<endl;
 		if(totalError < threshold){
 			break;
 		}
 	}
+	// cout << totalError << endl;
 }
 
 int main(){
@@ -144,21 +161,24 @@ int main(){
 	string positiveTweetsFile, negativeTweetsFile, objectiveTweetsFile;
 //	cout<<"Enter the path to positive tweets file :";
 //	cin>>positiveTweetsFile;
-	positiveTweetsFile = "TweetsCorpus/twitter_positive";
+	positiveTweetsFile = "positive";
 	
-	negativeTweetsFile = "TweetsCorpus/twitter_negative";
-	objectiveTweetsFile = "TweetsCorpus/twitter_objective";
+	negativeTweetsFile = "negative";
+	objectiveTweetsFile = "neutral";
 
 
 // negative, neutral, positive
 	readTweetFile(positiveTweetsFile, vector<int>{0,0,1} );
-	cout<< "KYA!" << endl;
+	cout<< wordCount << endl;
 
 	readTweetFile(negativeTweetsFile, vector<int>{1,0,0} );
-	cout<< "KYA!" << endl;
+	cout<< wordCount<< endl;
 
 	readTweetFile(objectiveTweetsFile,vector<int>{0,1,0} );
-cout<< "KYA!" << endl;
+	cout<< wordCount << endl;
+
+
+	printInput();
 
 	trainData();
 	return 0;
