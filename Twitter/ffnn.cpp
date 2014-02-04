@@ -11,19 +11,18 @@ using namespace std;
 typedef long long int lld;
 
 #define e 2.7182818284
-double eta;
-double mf;
+double eta = 0.2;
+double mf = 0.5;
 int mode;
-int mfbool;
+int mfbool = 1;
 class neuron{
-private:
+public:
 	int id;
 	int layerId;
 	double output;
 	vector<double> outputWeights;
 	double delta;
 	vector<double> prevOutputWeights;
-public:
 	neuron();
 	neuron(int id, int layerId);
 	void initializeWeights(int nextLayerSize);
@@ -95,7 +94,8 @@ void neuron::initializeWeights(int nextLayerSize){
 	/*initializing all weights to 1*/
 	srand(time(NULL));
 	for(int i = 0 ; i<nextLayerSize; i++){
-		outputWeights.push_back(double(rand())/INT_MAX);
+		outputWeights.push_back(double(rand()/1000)/INT_MAX);
+
 		// outputWeights.push_back(i);
 		prevOutputWeights.push_back(0.0);
 	}
@@ -117,7 +117,8 @@ void neuron::calculateAndUpdateOutput(vector<neuron> & previousLayer){
 	}
 
 	/*calculate the output using the sigmoid function i.e. 1/(1+e^(-net))*/
-	output = 1/(1+pow(e,-net));
+	// cout<<layerId<<" and "<<id<<" net is  "<<net<<" "<<(double)1/(double)(1+pow(e,-net))<<endl;
+	this->output = 1/(1+pow(e,-net));
 }
 
 void neuron::printWeights(){
@@ -154,29 +155,27 @@ void neuron::setDelta(double delta){
 
 neuronNetwork::neuronNetwork(vector<int> arrangement, int mode){
 	bpMode = mode;
-	mfbool = 0;
-	eta = 0.8;
 	Grid.clear();
 	int nextLayerSize;
-	cout << "YAHAN"  << endl;
+	// cout << "YAHAN"  << endl;
 	for(int i =0 ; i<arrangement.size(); i++){
-		cout << "YAHAN1"  << endl;
+		// cout << "YAHAN1"  << endl;
 		Grid.push_back(vector<neuron>());
-		cout << "YAHAN2"  << endl;
+		// cout << "YAHAN2"  << endl;
 		/*one extra neuron to take care of theta which will always output 1*/
 		/*remember this adds one dummy neuron in the outermost layer as well*/
 		for(int j = 0 ; j<=arrangement[i]; j++){
-			cout << "YAHAN3"  << endl;
+			// cout << "YAHAN3"  << endl;
 			Grid.back().push_back(neuron(j,i));
-			cout << "YAHAN4"  << endl;
+			// cout << "YAHAN4"  << endl;
 			// cout<<"neuron created id = "<<j<<" and layer = "<<i<<endl;
 			Grid.back().back().initializeWeights(i == arrangement.size() ? 0 : arrangement[i+1]);
 		}
-		cout << "YAHAN5"  << endl;
+		// cout << "YAHAN5"  << endl;
 		Grid[i].back().setOutput(1);
-		cout << "YAHAN6"  << endl;
+		// cout << "YAHAN6"  << endl;
 	}
-	cout << "DONE" << endl;
+	// cout << "DONE" << endl;
 }
 
 void neuronNetwork::feedInput(vector<int> inp, vector<int> out){
@@ -196,12 +195,14 @@ double neuronNetwork::propagateForward(){
 		for(j = 0; j<Grid[i].size()-1; j++){
 			/*set the output of this neuron using previous layer neurons*/
 			Grid[i][j].calculateAndUpdateOutput(Grid[i-1]);
+			// cout<<i<<" "<<j<<" "<<Grid[i][j].getOutput()<<" this is what i get "<<endl;
 		}
 		Grid[i][j].setOutput(1);
 	}
 	vector<neuron> &lastLayer = Grid.back();
 	double curError = 0;
-	for(int i = 0 ; i<lastLayer.size()-1; i++){
+	for(int i = 0 ; i<lastLayer.size()-1; i++) {
+		// cout<<lastLayer[i].layerId<<" "<<lastLayer[i].id<<" "<<lastLayer[i].getOutput()<<" see me"<<endl;
 		curError += (expectedOutput[i] - lastLayer[i].getOutput())*(expectedOutput[i] - lastLayer[i].getOutput());
 	}
 	return curError;

@@ -7,6 +7,7 @@
 #include <cstring>
 #include <algorithm>
 #include "ffnn.cpp"
+#include <signal.h>
 using namespace std;
 
 unordered_map<string , int> vocab;
@@ -23,6 +24,7 @@ vector<vector<int> > testOutput;
 
 vector<int> arrangement;
 vector<vector<int> > input;
+vector<vector<int> > testInput;
 // 	vector<vector<int> > output;
 neuronNetwork myNeuronGrid(arrangement,0);
 
@@ -99,34 +101,33 @@ vector<int> createInputVector(vector<string> in){
 	return out;
 }
 
-
 void printInput(){
 
 	for (int i = 0 ; i < trainingData.size(); i++){
 		vector<int> a = createInputVector(trainingData[i]);
-		for (int k = 0 ; k < trainingData[i].size() ; k++){
-			cout << trainingData[i][k] << " ";
-		}
-		cout << endl;
+		// for (int k = 0 ; k < trainingData[i].size() ; k++){
+		// 	cout << trainingData[i][k] << " ";
+		// }
+		// cout << endl;
 		// cout << a.size() << endl;
-		for (int k = 0 ; k < a.size(); k++){
-			cout << a[k] << " ";
-		}
-		cout << endl;
-		cout << "YAHAN AAYA\n";
+		// for (int k = 0 ; k < a.size(); k++){
+		// 	cout << a[k] << " ";
+		// }
+		// cout << endl;
+		// cout << "YAHAN AAYA\n";
 	}
-	cout << "OUT" << endl;
+	// cout << "OUT" << endl;
 	
 }
 
 void trainData(){
-cout << "IN" << endl;
+// cout << "IN" << endl;
 	numInputs = wordCount;
 	numOutputs = 3;
-	arrangement = vector<int>{numInputs,wordCount/2, numOutputs};
+	arrangement = vector<int>{numInputs,(wordCount+3)*2/3, numOutputs};
 	myNeuronGrid = neuronNetwork(arrangement, 0);
 
-	cout << "FINAL" << endl;
+	// cout << "FINAL" << endl;
 
 	threshold = 0.1;
 	for (int i = 0 ; i < trainingData.size(); i++){
@@ -138,21 +139,47 @@ cout << "IN" << endl;
 /*feed input and correct output*/
 	double totalError = 0;
 	lld numSteps = 0;
-	while(1 ){
+	cout<<"corpus size is "<<input.size()<<endl;
+	/*try random training*/
+	while(1){
 		totalError = 0;
-		cout << "HERE" << endl;
+		// cout << "HERE" << endl;
 		for(int i = 0 ; i<input.size(); i++){
+			// cout<<"*"<<flush;
 			myNeuronGrid.feedInput(input[i], trainingOutput[i]);
 			totalError += myNeuronGrid.propagateForward();
 			myNeuronGrid.propagateBackward();
 		}
 		numSteps += input.size();
-		cout<<totalError<<endl;
+		// cout<<"================================================================================\n";
+		cout<<endl<<totalError<<endl;
+		// cout<<"================================================================================\n";
 		if(totalError < threshold){
 			break;
 		}
 	}
 	// cout << totalError << endl;
+}
+
+
+void testOnData(){
+
+	testInput.clear();
+	for (int i = 0 ; i < testData.size(); i++){
+		testInput.push_back(createInputVector(testData[i]));
+
+	}
+
+	for(int i = 0 ; i<testInput.size(); i++){
+		myNeuronGrid.feedInput(testInput[i], testOutput[i]);
+		myNeuronGrid.print();
+		cout<<"\n\n";
+	}
+}
+
+void runTest(int signum){
+	signal(SIGINT, runTest);
+	testOnData();
 }
 
 int main(){
@@ -161,21 +188,22 @@ int main(){
 	string positiveTweetsFile, negativeTweetsFile, objectiveTweetsFile;
 //	cout<<"Enter the path to positive tweets file :";
 //	cin>>positiveTweetsFile;
-	positiveTweetsFile = "positive";
+	positiveTweetsFile = "TweetsCorpus/twitter_positive";
 	
-	negativeTweetsFile = "negative";
-	objectiveTweetsFile = "neutral";
+	negativeTweetsFile = "TweetsCorpus/twitter_negative";
+	// objectiveTweetsFile = "TweetsCorpus/neutral";
 
 
+	readTweetFile(negativeTweetsFile, vector<int>{1,0,0} );
+	cout<< wordCount<< endl;
 // negative, neutral, positive
 	readTweetFile(positiveTweetsFile, vector<int>{0,0,1} );
 	cout<< wordCount << endl;
 
-	readTweetFile(negativeTweetsFile, vector<int>{1,0,0} );
-	cout<< wordCount<< endl;
+	signal(SIGINT, runTest);
 
-	readTweetFile(objectiveTweetsFile,vector<int>{0,1,0} );
-	cout<< wordCount << endl;
+	// readTweetFile(objectiveTweetsFile,vector<int>{0,1,0} );
+	// cout<< wordCount << endl;
 
 
 	printInput();
