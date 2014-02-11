@@ -273,7 +273,6 @@ void neuronNetwork::propagateBackward_later(){
 			currentLayer[j].updateWeight(Grid[i-1]);
 		}
 	}
-
 	updateWeights();
 }
 
@@ -331,6 +330,8 @@ void neuronNetwork::printWeights(){
 	for(int i = 0 ; i<Grid[0].size(); i++){
 		cout<<"Neuron "<<i<<" ";
 		Grid[0][i].printWeights();
+		cout<<endl;
+		cout<<"net value is "<<Grid[0][i].net;
 		cout<<endl;
 	}
 

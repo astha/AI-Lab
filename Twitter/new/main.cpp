@@ -40,37 +40,37 @@ void processTweet(string tweet){
 	tweetVector.clear();
 	char * token;
 	strcpy(tweetCstring,tweet.c_str());
-	token = strtok(tweetCstring, " \",#.\t()!:\n?[]");
+	token = strtok(tweetCstring, " \t\n");
 	string tokenStr; 
 	while (token != NULL){
 		tokenStr = string(token);
 
 		
-		int length = tokenStr.length();
+		// int length = tokenStr.length();
 
-		// Removing People Tags
-		if (token[0] == '@' || token[0] == '$' || strcmp(token, "\n") == 0 || strcmp(token, "\t") == 0 || length <= 2) {
-			token = strtok(NULL, " \",#.\t()!:\n?[]");
-			continue;
-		}
-
-
-		// cout<<tokenStr<<endl;
-		if(tokenStr.substr(length-3, 3) == "ing"){
-			tokenStr = tokenStr.substr(0,length-3);
-			length -= 3;
-		}
+		// // Removing People Tags
+		// if (token[0] == '@' || token[0] == '$' || strcmp(token, "\n") == 0 || strcmp(token, "\t") == 0 || length <= 2) {
+		// 	token = strtok(NULL, " \",#.\t()!:\n?[]");
+		// 	continue;
+		// }
 
 
-		else if(tokenStr.substr(length-2, 2) == "ed" || tokenStr.substr(length-2, 2) == "ly" || tokenStr.substr(length-2, 2) == "'s" ){
-			tokenStr = tokenStr.substr(0,length-2);
-			length -= 2;
-		}
+		// // cout<<tokenStr<<endl;
+		// if(tokenStr.substr(length-3, 3) == "ing"){
+		// 	tokenStr = tokenStr.substr(0,length-3);
+		// 	length -= 3;
+		// }
 
-		if(length >= 2 && tokenStr.substr(0, 2) == "//"){
-			tokenStr = tokenStr.substr(2,length-2);
-			length -= 2;
-		}
+
+		// else if(tokenStr.substr(length-2, 2) == "ed" || tokenStr.substr(length-2, 2) == "ly" || tokenStr.substr(length-2, 2) == "'s" ){
+		// 	tokenStr = tokenStr.substr(0,length-2);
+		// 	length -= 2;
+		// }
+
+		// if(length >= 2 && tokenStr.substr(0, 2) == "//"){
+		// 	tokenStr = tokenStr.substr(2,length-2);
+		// 	length -= 2;
+		// }
 
 		
 		// exit(0);
@@ -80,15 +80,34 @@ void processTweet(string tweet){
 			wordFreq[tokenStr] ++;
 		}
 		else {
-			cout<<wordCount<<" and "<<tokenStr<<endl;
+			// cout<<wordCount<<" and "<<tokenStr<<endl;
 			vocab[tokenStr] = wordCount++;
 			wordFreq[tokenStr] = 1;
 		}
 		tweetVector.push_back(tokenStr);
 
 		// cout << tokenStr << endl;
-		token = strtok(NULL, " \",#.\t()!:\n?[]");
+		token = strtok(NULL, " \t\n");
 	}
+}
+
+void deleteLowFreqWords(){
+	unordered_map<string, int> newVocab;
+	unordered_map<string, int> newFreq;
+
+	int currIndex = 0;
+
+	unordered_map<string, int>::iterator it;
+	for(it = wordFreq.begin(); it != wordFreq.end(); it++){
+		if(it->second>1 && (it->first).length() > 2){
+			cout<<it->first<<" and "<<currIndex<<endl;
+			newFreq.insert(pair<string, int>(it->first, it->second));
+			newVocab.insert(pair<string, int>(it->first, currIndex++));
+		}
+	}
+	vocab = newVocab;
+	wordFreq = newFreq;
+	wordCount = currIndex;
 }
 
 
@@ -119,6 +138,8 @@ void readTweetFile(string filename , vector<int> output){
 }
 
 vector<int> createInputVector(vector<string> in){
+	// cout<<wordCount<<endl;
+	// exit(0);
 	vector<int> out(wordCount, 0);
 	
 	for (int i = 0 ; i < in.size(); i++){
@@ -145,7 +166,8 @@ void printInput(){
 		// cout << "YAHAN AAYA\n";
 	}
 	// cout << "OUT" << endl;
-	
+
+	// exit(0);	
 }
 
 void trainData(){
@@ -163,21 +185,20 @@ void trainData(){
 
 	}
 
-
 /*feed input and correct output*/
 	double totalError = 0;
 	lld numSteps = 0;
 	cout<<"corpus size is "<<input.size()<<endl;
 	/*try random training*/
-	// exit(0);
 	while(1){
 		totalError = 0;
-		cout << "HERE" << endl;
-		cout<<input.size()<<endl;
-		exit(0);
+		// cout << "HERE" << endl;
+		// cout<<input.size()<<endl;
+		
 		for(int i = 0 ; i<input.size(); i++){
 			// cout<<"*"<<flush;
 			// exit(0);
+			// cout<<"HERE "<<endl;
 			
 			myNeuronGrid.feedInput(input[i], trainingOutput[i]);
 			totalError += myNeuronGrid.propagateForward();
@@ -185,7 +206,7 @@ void trainData(){
 		}
 		numSteps += input.size();
 		// cout<<"================================================================================\n";
-		cout<<endl<<totalError<<endl;
+		cout<<totalError<<flush<<endl;
 		// cout<<"================================================================================\n";
 		if(totalError < threshold){
 			break;
@@ -227,11 +248,11 @@ int main(){
 	string positiveTweetsFile, negativeTweetsFile, objectiveTweetsFile;
 //	cout<<"Enter the path to positive tweets file :";
 //	cin>>positiveTweetsFile;
-	positiveTweetsFile = "TweetsCorpus/twitter_positive";
+	positiveTweetsFile = "featurePositive";
 	
-	negativeTweetsFile = "TweetsCorpus/twitter_negative";
+	negativeTweetsFile = "featureNegative";
 	// negativeTweetsFile = "TweetsCorpus/twitter_objective";
-	objectiveTweetsFile = "TweetsCorpus/twitter_objective";
+	objectiveTweetsFile = "featureObjective";
 
 
 	readTweetFile(negativeTweetsFile, vector<int>{1,0,0} );
@@ -248,12 +269,11 @@ int main(){
 	// readTweetFile(objectiveTweetsFile,vector<int>{0,1,0} );
 	// cout<< wordCount << endl;
 
+	deleteLowFreqWords();
 
 	printInput();
 
 	trainData();
-
-	while(1);
 	return 0;
 
 }
