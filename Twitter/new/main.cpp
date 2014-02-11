@@ -178,12 +178,12 @@ void testOnData();
 void trainData(){
 	numInputs = wordCount;
 	numOutputs = 3;
-	arrangement = vector<int>{numInputs,7, numOutputs};
-	myNeuronGrid = neuronNetwork(arrangement, 0);
+	arrangement = vector<int>{numInputs,10, numOutputs};
+	myNeuronGrid = neuronNetwork(arrangement, 1);
 
 	input.clear();
 
-	threshold = 1;
+	threshold = 1.5;
 	// cout<<"size of training data is "<<trainingData.size()<<endl;
 	for (int i = 0 ; i < trainingData.size(); i++){
 		input.push_back(createInputVector(trainingData[i]));
@@ -324,6 +324,7 @@ void testOnData(){
 		testInput.push_back(createInputVector(testData[i]));
 	}
 	// cout<<testInput.size()<<"yo there"<<endl;
+	int correct = 0;
 	for(int i = 0 ; i<testInput.size(); i++){
 		myNeuronGrid.feedInput(testInput[i], testOutput[i]);
 		myNeuronGrid.propagateForward();
@@ -332,9 +333,10 @@ void testOnData(){
 		// 	if(testInput[i][j])ones++;
 		// }
 		// cout<<ones<<endl;
-		myNeuronGrid.print();
+		correct += myNeuronGrid.print();
 		cout<<"\n\n";
 	}
+	cout<<"Number of correct outputs = "<<correct<<" out of "<<testInput.size()<<" tweets"<<endl;
 	// myNeuronGrid.printWeights();
 }
 
@@ -369,7 +371,7 @@ int main(){
 
 	// readTweetFile(objectiveTweetsFile,vector<int>{0,1,0} );
 	// cout<< wordCount << endl;
-	deleteLowFreqWords();
+	// deleteLowFreqWords();
 
 	// printInput();
 	// printFeatureVector(0);

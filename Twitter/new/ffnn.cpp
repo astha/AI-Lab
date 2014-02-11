@@ -148,7 +148,7 @@ public:
 	void propagateBackward_later();
 	void setDelta(double delta);
 	void updateWeights();
-	void print();
+	int print();
 	void printWeights();
 };
 
@@ -285,25 +285,32 @@ void neuronNetwork::updateWeights(){
 	}
 }
 
-void neuronNetwork::print(){
+int neuronNetwork::print(){
 
 	cout<<"net on the output neurons"<<endl;
 	for(int i = 0 ; i<Grid.back().size(); i++){
 		cout<<Grid.back()[i].net<<" ";
 	}
 	cout<<endl;
-
+	int neededIndex;
 	cout<<"Expected Output ";
 	for(int i = 0 ; i<expectedOutput.size(); i++){
+		if(expectedOutput[i] == 1) neededIndex = i;
 		cout<<expectedOutput[i]<<" ";
 	}
 	cout<<endl;
-
+	int maxIndex = -1;
+	int maxOutput = -100;
+	double temp;
 	cout<<"Current Output  ";
 	for(int i = 0 ; i<expectedOutput.size(); i++){
-		cout<<Grid.back()[i].getOutput()<<" ";
+		temp = Grid.back()[i].getOutput();
+		if(temp > maxOutput) maxIndex = i;
+		cout<<temp<<" ";
 	}
 	cout<<endl;
+	if(maxIndex == neededIndex) return 1;
+	else return 0;
 }
 
 vector<vector<int> > genTruthTable(int n){
