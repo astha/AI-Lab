@@ -47,42 +47,8 @@ void processTweet(string tweet){
 	while (token != NULL){
 		tokenStr = string(token);
 
-		
-		// int length = tokenStr.length();
-
-		// // Removing People Tags
-		// if (token[0] == '@' || token[0] == '$' || strcmp(token, "\n") == 0 || strcmp(token, "\t") == 0 || length <= 2) {
-		// 	token = strtok(NULL, " \",#.\t()!:\n?[]");
-		// 	continue;
-		// }
-
-
-		// // cout<<tokenStr<<endl;
-		// if(tokenStr.substr(length-3, 3) == "ing"){
-		// 	tokenStr = tokenStr.substr(0,length-3);
-		// 	length -= 3;
-		// }
-
-
-		// else if(tokenStr.substr(length-2, 2) == "ed" || tokenStr.substr(length-2, 2) == "ly" || tokenStr.substr(length-2, 2) == "'s" ){
-		// 	tokenStr = tokenStr.substr(0,length-2);
-		// 	length -= 2;
-		// }
-
-		// if(length >= 2 && tokenStr.substr(0, 2) == "//"){
-		// 	tokenStr = tokenStr.substr(2,length-2);
-		// 	length -= 2;
-		// }
-
-		
-		// exit(0);
-		// cout<<tokenStr<<endl;
-
 		if (vocab.find(tokenStr) != vocab.end()){
-			// cout<<wordFreq[tokenStr]<<" yo1 "<<endl;
 			wordFreq[tokenStr]++;
-			// cout<<wordFreq[tokenStr]<<" yo2 "<<endl;
-			// exit(0);
 		}
 		else {
 			// cout<<wordCount<<" and "<<tokenStr<<endl;
@@ -132,8 +98,6 @@ void readTweetFile(string filename , vector<int> output){
 		if (tweetCount%5==0){
 			testData.push_back(tweetVector);
 			testOutput.push_back(output);
-			trainingData.push_back(tweetVector);
-			trainingOutput.push_back(output);
 		}
 		else {
 			trainingData.push_back(tweetVector);
@@ -146,45 +110,45 @@ void readTweetFile(string filename , vector<int> output){
 vector<int> createInputVector(vector<string> in){
 	// cout<<wordCount<<endl;input
 	// exit(0);
-	vector<int> out1(wordCount, 0);
+	vector<int> out(wordCount, 0);
 	
 	// cout<<"nums coming for in sinputize "<<in.size()<<"  :  ";
 	for (int i = 0 ; i < in.size(); i++){
 		if (vocab.find(in[i]) != vocab.end()){
 			// cout<<vocab[in[i]]<<" ";
-			out1[vocab[in[i]]] ++;
+			out[vocab[in[i]]] ++;
 		}
 	}
 	// cout<<endl;
-	return out1;
+	return out;
 }
 
 vector<int> createInputVector1(vector<string> in){
 	// cout<<wordCount<<endl;input
 	// exit(0);
-	vector<int> out1(wordCount, 0);
+	vector<int> out(wordCount, 0);
 	
 	cout<<"creating training vector : ";
 	for (int i = 0 ; i < in.size(); i++){
 		cout<<in[i]<<" ";
 		if (vocab.find(in[i]) != vocab.end()){
 			// cout<<vocab[in[i]]<<" ";
-			out1[vocab[in[i]]]++;
+			out[vocab[in[i]]]++;
 		}
 	}
 	cout<<endl;
 
 	cout<<"printing formed vector : ";
-	for (int i = 0 ; i < out1.size(); i++){
-		if (out1[i] != 0){
-			cout<<i<<" and "<<out1[i]<<"    ";
+	for (int i = 0 ; i < out.size(); i++){
+		if (out[i] != 0){
+			cout<<i<<" and "<<out[i]<<"    ";
 		}
 	}
 	cout<<endl;
 	cout<<endl;
 	// cout<<endl;
 	exit(0);
-	return out1;
+	return out;
 }
 
 void printInput(){
@@ -208,15 +172,14 @@ void printInput(){
 }
 
 void printFeatureVectorArgvector(vector<int> v, int i);
+void testAllData();
+void testOnData();
 
 void trainData(){
-// cout << "IN" << endl;
 	numInputs = wordCount;
 	numOutputs = 3;
-	arrangement = vector<int>{numInputs, numOutputs};
-	myNeuronGrid = neuronNetwork(arrangement, 1);
-
-	// cout << "FINAL" << endl;
+	arrangement = vector<int>{numInputs,7, numOutputs};
+	myNeuronGrid = neuronNetwork(arrangement, 0);
 
 	input.clear();
 
@@ -228,11 +191,10 @@ void trainData(){
 
 	// exit(0);
 
-/*feed input and correct output*/
+	/*feed input and correct output*/
 	double totalError = 0;
 	lld numSteps = 0;
 	cout<<"corpus size is "<<input.size()<<endl;
-	/*try random training*/
 	while(1){
 		totalError = 0;
 		// cout << "HERE" << endl;
@@ -242,13 +204,13 @@ void trainData(){
 			// cout<<"*"<<flush;
 			// exit(0);
 			// cout<<"HERE "<<endl;
-			cout<<i<<endl;
+			// cout<<i<<endl;
 			myNeuronGrid.feedInput(input[i], trainingOutput[i]);
 			totalError += myNeuronGrid.propagateForward();
 			myNeuronGrid.propagateBackward();
-			cout<<flush<<endl;
-			printFeatureVectorArgvector(input[i], i);
-			cout<<flush<<endl;
+			// cout<<flush<<endl;
+			// printFeatureVectorArgvector(input[i], i);
+			// cout<<flush<<endl;
 		}
 		numSteps += input.size();
 		// cout<<"================================================================================\n";
@@ -257,7 +219,38 @@ void trainData(){
 		if(totalError < threshold){
 			break;
 		}
+	}
+	testOnData();
+}
 
+void testAllData(){
+// cout << "IN" << endl
+
+	// cout << "FINAL" << endl;
+
+	input.clear();
+
+	threshold = 1;
+	// cout<<"size of training data is "<<trainingData.size()<<endl;
+	for (int i = 0 ; i < trainingData.size(); i+=5){
+		input.push_back(createInputVector(trainingData[i]));
+	}
+
+	// exit(0);
+
+	/*feed input and correct output*/
+	/*try random training*/
+	for(int i = 0 ; i<input.size(); i++){
+		// cout<<"*"<<flush;
+		// exit(0);
+		// cout<<"HERE "<<endl;
+		cout<<i<<endl;
+		myNeuronGrid.feedInput(input[i], trainingOutput[i]);
+		myNeuronGrid.propagateForward();
+		myNeuronGrid.print();
+		// cout<<flush<<endl;
+		// printFeatureVectorArgvector(input[i], i);
+		// cout<<flush<<endl;
 	}
 	// cout << totalError << endl;
 }
@@ -305,7 +298,7 @@ void printFeatureVectorArgvector(vector<int> myfeature, int i){
 	numInputs = wordCount;
 	numOutputs = 3;
 	arrangement = vector<int>{numInputs, numOutputs};
-	myNeuronGrid = neuronNetwork(arrangement, 1);
+	myNeuronGrid = neuronNetwork(arrangement, 0);
 
 	double netVal = 0;
 
@@ -328,22 +321,17 @@ void testOnData(){
 	testInput.clear();
 	// cout<<testData.size()<<" size 0 h testData ka"<<endl;
 	for (int i = 0 ; i < testData.size(); i++){
-		// cout<<testData[i].size()<<" size 0 h"<<endl;
-		for(int h = 0; h < testData[i].size(); h++){
-			// cout<<testData[i][h]<<" ";
-		}
-		// cout<<endl;
-		testInput.push_back(createInputVector1(testData[i]));
-
+		testInput.push_back(createInputVector(testData[i]));
 	}
 	// cout<<testInput.size()<<"yo there"<<endl;
 	for(int i = 0 ; i<testInput.size(); i++){
 		myNeuronGrid.feedInput(testInput[i], testOutput[i]);
-		int ones = 0;
-		for(int j = 0 ;j<testInput[i].size(); j++){
-			if(testInput[i][j])ones++;
-		}
-		cout<<ones<<endl;
+		myNeuronGrid.propagateForward();
+		// int ones = 0;
+		// for(int j = 0 ;j<testInput[i].size(); j++){
+		// 	if(testInput[i][j])ones++;
+		// }
+		// cout<<ones<<endl;
 		myNeuronGrid.print();
 		cout<<"\n\n";
 	}
@@ -381,7 +369,7 @@ int main(){
 
 	// readTweetFile(objectiveTweetsFile,vector<int>{0,1,0} );
 	// cout<< wordCount << endl;
-	// deleteLowFreqWords();
+	deleteLowFreqWords();
 
 	// printInput();
 	// printFeatureVector(0);
