@@ -123,6 +123,7 @@ void neuron::calculateAndUpdateOutput(vector<neuron> & previousLayer){
 }
 
 void neuron::printWeights(){
+	cout<<" layerid = "<<layerId<<" ";
 	for(int i = 0 ;i<outputWeights.size(); i++){
 		cout<<outputWeights[i]<<" ";
 	}
@@ -133,11 +134,11 @@ void neuron::printWeights(){
 /***************************************************************************************/
 
 class neuronNetwork{
-private:
+public:
 	vector<int> expectedOutput;
 	vector<vector<neuron> > Grid;
 	int bpMode;
-public:
+
 	neuronNetwork();
 	neuronNetwork(vector<int> arrangement, int mode);
 	void feedInput(vector<int> inp, vector<int> out);
@@ -332,6 +333,14 @@ void neuronNetwork::printWeights(){
 		Grid[0][i].printWeights();
 		cout<<endl;
 		cout<<"net value is "<<Grid[0][i].net;
+		cout<<endl;
+	}
+	cout<<endl;
+	for(int i = 0 ; i<Grid[1].size(); i++){
+		cout<<"Neuron layer1 "<<i<<" ";
+		// Grid[1][i].printWeights();
+		// cout<<endl;
+		cout<<"net value is "<<Grid[1][i].net;
 		cout<<endl;
 	}
 

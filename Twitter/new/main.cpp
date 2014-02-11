@@ -10,6 +10,8 @@
 #include <signal.h>
 using namespace std;
 
+#define e 2.7182818284
+
 unordered_map<string , int> vocab;
 unordered_map<string , int> wordFreq;
 
@@ -77,11 +79,14 @@ void processTweet(string tweet){
 		// cout<<tokenStr<<endl;
 
 		if (vocab.find(tokenStr) != vocab.end()){
-			wordFreq[tokenStr] ++;
+			// cout<<wordFreq[tokenStr]<<" yo1 "<<endl;
+			wordFreq[tokenStr]++;
+			// cout<<wordFreq[tokenStr]<<" yo2 "<<endl;
+			// exit(0);
 		}
 		else {
 			// cout<<wordCount<<" and "<<tokenStr<<endl;
-			vocab[tokenStr] = wordCount++;
+			vocab.insert(pair<string, int>(tokenStr,wordCount++));
 			wordFreq[tokenStr] = 1;
 		}
 		tweetVector.push_back(tokenStr);
@@ -108,6 +113,7 @@ void deleteLowFreqWords(){
 	vocab = newVocab;
 	wordFreq = newFreq;
 	wordCount = currIndex;
+	// exit(0);
 }
 
 
@@ -138,16 +144,47 @@ void readTweetFile(string filename , vector<int> output){
 }
 
 vector<int> createInputVector(vector<string> in){
-	// cout<<wordCount<<endl;
+	// cout<<wordCount<<endl;input
 	// exit(0);
-	vector<int> out(wordCount, 0);
+	vector<int> out1(wordCount, 0);
 	
+	// cout<<"nums coming for in sinputize "<<in.size()<<"  :  ";
 	for (int i = 0 ; i < in.size(); i++){
 		if (vocab.find(in[i]) != vocab.end()){
-			out[vocab[in[i]]] ++;
+			// cout<<vocab[in[i]]<<" ";
+			out1[vocab[in[i]]] ++;
 		}
 	}
-	return out;
+	// cout<<endl;
+	return out1;
+}
+
+vector<int> createInputVector1(vector<string> in){
+	// cout<<wordCount<<endl;input
+	// exit(0);
+	vector<int> out1(wordCount, 0);
+	
+	cout<<"creating training vector : ";
+	for (int i = 0 ; i < in.size(); i++){
+		cout<<in[i]<<" ";
+		if (vocab.find(in[i]) != vocab.end()){
+			// cout<<vocab[in[i]]<<" ";
+			out1[vocab[in[i]]]++;
+		}
+	}
+	cout<<endl;
+
+	cout<<"printing formed vector : ";
+	for (int i = 0 ; i < out1.size(); i++){
+		if (out1[i] != 0){
+			cout<<i<<" and "<<out1[i]<<"    ";
+		}
+	}
+	cout<<endl;
+	cout<<endl;
+	// cout<<endl;
+	exit(0);
+	return out1;
 }
 
 void printInput(){
@@ -170,20 +207,26 @@ void printInput(){
 	// exit(0);	
 }
 
+void printFeatureVectorArgvector(vector<int> v, int i);
+
 void trainData(){
 // cout << "IN" << endl;
 	numInputs = wordCount;
 	numOutputs = 3;
 	arrangement = vector<int>{numInputs, numOutputs};
-	myNeuronGrid = neuronNetwork(arrangement, 0);
+	myNeuronGrid = neuronNetwork(arrangement, 1);
 
 	// cout << "FINAL" << endl;
 
+	input.clear();
+
 	threshold = 1;
+	// cout<<"size of training data is "<<trainingData.size()<<endl;
 	for (int i = 0 ; i < trainingData.size(); i++){
 		input.push_back(createInputVector(trainingData[i]));
-
 	}
+
+	// exit(0);
 
 /*feed input and correct output*/
 	double totalError = 0;
@@ -199,10 +242,13 @@ void trainData(){
 			// cout<<"*"<<flush;
 			// exit(0);
 			// cout<<"HERE "<<endl;
-			
+			cout<<i<<endl;
 			myNeuronGrid.feedInput(input[i], trainingOutput[i]);
 			totalError += myNeuronGrid.propagateForward();
 			myNeuronGrid.propagateBackward();
+			cout<<flush<<endl;
+			printFeatureVectorArgvector(input[i], i);
+			cout<<flush<<endl;
 		}
 		numSteps += input.size();
 		// cout<<"================================================================================\n";
@@ -211,30 +257,97 @@ void trainData(){
 		if(totalError < threshold){
 			break;
 		}
+
 	}
 	// cout << totalError << endl;
+}
+
+void printFeatureVector(int i){
+	vector<int> myfeature;
+	myfeature = createInputVector(trainingData[i]);
+
+	cout<<"Imp words in tweet :"<<endl;
+	for(int a = 0 ; a<trainingData[i].size(); a++){
+		cout<<trainingData[i][a]<<" ";
+	}
+	cout<<endl;
+
+	numInputs = wordCount;
+	numOutputs = 3;
+	arrangement = vector<int>{numInputs, numOutputs};
+	myNeuronGrid = neuronNetwork(arrangement, 1);
+
+	double netVal = 0;
+
+	cout<<"feature vector is with size : "<<myfeature.size()<<endl;
+	for(int a = 0 ; a<myfeature.size(); a++){
+		if(myfeature[a] != 0){
+			cout<<a<<" , "<<myfeature[a]<<"  |  ";
+			netVal += (myfeature[a]*myNeuronGrid.Grid[0][a].outputWeights[0]);
+		}
+	}
+	// exit(0);
+	cout<<endl<<flush;
+	cout<<"netVal is "<<netVal<<" and the value comes out to be "<<1/(1+(pow(e,netVal)))<<endl;
+
+}
+
+void printFeatureVectorArgvector(vector<int> myfeature, int i){
+	// vector<int> myfeature;
+	// myfeature = createInputVector(trainingData[i]);
+
+	cout<<"Imp words in tweet :"<<endl;
+	for(int a = 0 ; a<trainingData[i].size(); a++){
+		cout<<trainingData[i][a]<<" ";
+	}
+	cout<<endl;
+
+	numInputs = wordCount;
+	numOutputs = 3;
+	arrangement = vector<int>{numInputs, numOutputs};
+	myNeuronGrid = neuronNetwork(arrangement, 1);
+
+	double netVal = 0;
+
+	cout<<"feature vector is with size : "<<myfeature.size()<<endl;
+	for(int a = 0 ; a<myfeature.size(); a++){
+		if(myfeature[a] != 0){
+			cout<<a<<" , "<<myfeature[a]<<"  |  ";
+			netVal += (myfeature[a]*myNeuronGrid.Grid[0][a].outputWeights[0]);
+		}
+	}
+	// exit(0);
+	cout<<endl<<flush;
+	cout<<"netVal is "<<netVal<<" and the value comes out to be "<<1/(1+(pow(e,netVal)))<<endl;
+
 }
 
 
 void testOnData(){
 
-	// testInput.clear();
-	// for (int i = 0 ; i < testData.size(); i++){
-	// 	testInput.push_back(createInputVector(testData[i]));
+	testInput.clear();
+	// cout<<testData.size()<<" size 0 h testData ka"<<endl;
+	for (int i = 0 ; i < testData.size(); i++){
+		// cout<<testData[i].size()<<" size 0 h"<<endl;
+		for(int h = 0; h < testData[i].size(); h++){
+			// cout<<testData[i][h]<<" ";
+		}
+		// cout<<endl;
+		testInput.push_back(createInputVector1(testData[i]));
 
-	// }
-
-	// for(int i = 0 ; i<testInput.size(); i++){
-	// 	myNeuronGrid.feedInput(testInput[i], testOutput[i]);
-	// 	int ones = 0;
-	// 	for(int j = 0 ;j<testInput[i].size(); j++){
-	// 		if(testInput[i][j])ones++;
-	// 	}
-	// 	cout<<ones<<endl;
-	// 	myNeuronGrid.print();
-	// 	cout<<"\n\n";
-	// }
-	myNeuronGrid.printWeights();
+	}
+	// cout<<testInput.size()<<"yo there"<<endl;
+	for(int i = 0 ; i<testInput.size(); i++){
+		myNeuronGrid.feedInput(testInput[i], testOutput[i]);
+		int ones = 0;
+		for(int j = 0 ;j<testInput[i].size(); j++){
+			if(testInput[i][j])ones++;
+		}
+		cout<<ones<<endl;
+		myNeuronGrid.print();
+		cout<<"\n\n";
+	}
+	// myNeuronGrid.printWeights();
 }
 
 void runTest(int signum){
@@ -268,10 +381,15 @@ int main(){
 
 	// readTweetFile(objectiveTweetsFile,vector<int>{0,1,0} );
 	// cout<< wordCount << endl;
+	// deleteLowFreqWords();
 
-	deleteLowFreqWords();
-
-	printInput();
+	// printInput();
+	// printFeatureVector(0);
+	// cout<<"######################################"<<endl;
+	// printFeatureVector(1);
+	// cout<<"######################################"<<endl;
+	// printFeatureVector(2);
+	// cout<<"######################################"<<endl;
 
 	trainData();
 	return 0;
