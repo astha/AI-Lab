@@ -120,9 +120,12 @@ void neuron::calculateAndUpdateOutput(vector<neuron> & previousLayer){
 	/*calculate the output using the sigmoid function i.e. 1/(1+e^(-net))*/
 	// cout<<layerId<<" and "<<id<<" net is  "<<net<<" "<<(double)1/(double)(1+pow(e,-net))<<endl;
 	this->output = 1/(1+pow(e,-net));
+	// this->output Math::Exp (flt32_t exp);
+	// this->output = (double)flt64_t Math::Exp (flt64_t exp);
 }
 
 void neuron::printWeights(){
+	cout<<" layerid = "<<layerId<<" ";
 	for(int i = 0 ;i<outputWeights.size(); i++){
 		cout<<outputWeights[i]<<" ";
 	}
@@ -133,21 +136,21 @@ void neuron::printWeights(){
 /***************************************************************************************/
 
 class neuronNetwork{
-private:
+public:
 	vector<int> expectedOutput;
 	vector<vector<neuron> > Grid;
 	int bpMode;
-public:
+
 	neuronNetwork();
 	neuronNetwork(vector<int> arrangement, int mode);
-	void feedInput(vector<int> inp, vector<int> out);
+	void feedInput(vector<double> inp, vector<int> out);
 	double propagateForward();
 	void propagateBackward();
 	void propagateBackward_active();
 	void propagateBackward_later();
 	void setDelta(double delta);
 	void updateWeights();
-	void print();
+	int print();
 	void printWeights();
 };
 
@@ -180,7 +183,7 @@ neuronNetwork::neuronNetwork(vector<int> arrangement, int mode){
 	// cout << "DONE" << endl;
 }
 
-void neuronNetwork::feedInput(vector<int> inp, vector<int> out){
+void neuronNetwork::feedInput(vector<double> inp, vector<int> out){
 	expectedOutput = out;
 	/*set the output of the neurons in the first layer*/
 	int i;
@@ -273,7 +276,6 @@ void neuronNetwork::propagateBackward_later(){
 			currentLayer[j].updateWeight(Grid[i-1]);
 		}
 	}
-
 	updateWeights();
 }
 
@@ -285,25 +287,37 @@ void neuronNetwork::updateWeights(){
 	}
 }
 
-void neuronNetwork::print(){
+int neuronNetwork::print(){
 
 	cout<<"net on the output neurons"<<endl;
 	for(int i = 0 ; i<Grid.back().size(); i++){
 		cout<<Grid.back()[i].net<<" ";
 	}
 	cout<<endl;
-
 	cout<<"Expected Output ";
 	for(int i = 0 ; i<expectedOutput.size(); i++){
 		cout<<expectedOutput[i]<<" ";
 	}
 	cout<<endl;
-
 	cout<<"Current Output  ";
 	for(int i = 0 ; i<expectedOutput.size(); i++){
 		cout<<Grid.back()[i].getOutput()<<" ";
 	}
 	cout<<endl;
+
+	int k = 0; 
+	for(int i = 0; i<expectedOutput.size(); i++){
+		if(abs(Grid.back()[i].getOutput() - expectedOutput[i]) < 0.2) k++;
+	}
+	if(k == expectedOutput.size()){
+		cout<<"correct"<<endl;
+		return 1;
+	}
+	else {
+		cout<<"wrong"<<endl;
+		return 0;
+	}
+	
 }
 
 vector<vector<int> > genTruthTable(int n){
@@ -331,6 +345,16 @@ void neuronNetwork::printWeights(){
 	for(int i = 0 ; i<Grid[0].size(); i++){
 		cout<<"Neuron "<<i<<" ";
 		Grid[0][i].printWeights();
+		cout<<endl;
+		cout<<"net value is "<<Grid[0][i].net;
+		cout<<endl;
+	}
+	cout<<endl;
+	for(int i = 0 ; i<Grid[1].size(); i++){
+		cout<<"Neuron layer1 "<<i<<" ";
+		// Grid[1][i].printWeights();
+		// cout<<endl;
+		cout<<"net value is "<<Grid[1][i].net;
 		cout<<endl;
 	}
 

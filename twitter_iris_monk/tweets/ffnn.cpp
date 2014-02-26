@@ -11,19 +11,19 @@ using namespace std;
 typedef long long int lld;
 
 #define e 2.7182818284
-double eta;
-double mf;
+double eta = 0.1;
+double mf = 0;
 int mode;
-int mfbool;
+int mfbool = 0;
 class neuron{
-private:
+public:
 	int id;
 	int layerId;
+	double net;
 	double output;
 	vector<double> outputWeights;
 	double delta;
 	vector<double> prevOutputWeights;
- public:
 	neuron();
 	neuron(int id, int layerId);
 	void initializeWeights(int nextLayerSize);
@@ -39,16 +39,11 @@ private:
 	void printWeights();
 	double getPreviousOutputWeight(int id);
 	void setPreviousOutputWeight(int id, double tmp);
-	void myPrint();
 };
-
-
-void neuron::myPrint(){
-	cout<<output<<" ";
-}
 
 double neuron::setOutputWeight(int i, double val){
 	outputWeights[i] = val;
+	return val;
 }
 
 neuron::neuron(int id, int layerId){
@@ -101,6 +96,7 @@ void neuron::initializeWeights(int nextLayerSize){
 	srand(time(NULL));
 	for(int i = 0 ; i<nextLayerSize; i++){
 		outputWeights.push_back(double(rand())/INT_MAX);
+
 		// outputWeights.push_back(i);
 		prevOutputWeights.push_back(0.0);
 	}
@@ -116,16 +112,20 @@ double neuron::getOutput(){
 
 void neuron::calculateAndUpdateOutput(vector<neuron> & previousLayer){
 	/*calculate the input argument i.e. net = sigma(wi*xi) */
-	double net = 0;
+	net = 0;
 	for(int i = 0 ; i < previousLayer.size(); i++){
 		net += previousLayer[i].getOutputWeight(id)*previousLayer[i].getOutput();
 	}
 
 	/*calculate the output using the sigmoid function i.e. 1/(1+e^(-net))*/
-	output = 1/(1+pow(e,-net));
+	// cout<<layerId<<" and "<<id<<" net is  "<<net<<" "<<(double)1/(double)(1+pow(e,-net))<<endl;
+	this->output = 1/(1+pow(e,-net));
+	// this->output Math::Exp (flt32_t exp);
+	// this->output = (double)flt64_t Math::Exp (flt64_t exp);
 }
 
 void neuron::printWeights(){
+	cout<<" layerid = "<<layerId<<" ";
 	for(int i = 0 ;i<outputWeights.size(); i++){
 		cout<<outputWeights[i]<<" ";
 	}
@@ -136,11 +136,11 @@ void neuron::printWeights(){
 /***************************************************************************************/
 
 class neuronNetwork{
-private:
+public:
 	vector<int> expectedOutput;
 	vector<vector<neuron> > Grid;
 	int bpMode;
-public:
+
 	neuronNetwork();
 	neuronNetwork(vector<int> arrangement, int mode);
 	void feedInput(vector<int> inp, vector<int> out);
@@ -150,7 +150,8 @@ public:
 	void propagateBackward_later();
 	void setDelta(double delta);
 	void updateWeights();
-	void print();
+	int print();
+	void printWeights();
 };
 
 void neuron::setDelta(double delta){
@@ -161,17 +162,25 @@ neuronNetwork::neuronNetwork(vector<int> arrangement, int mode){
 	bpMode = mode;
 	Grid.clear();
 	int nextLayerSize;
+	// cout << "YAHAN"  << endl;
 	for(int i =0 ; i<arrangement.size(); i++){
+		// cout << "YAHAN1"  << endl;
 		Grid.push_back(vector<neuron>());
+		// cout << "YAHAN2"  << endl;
 		/*one extra neuron to take care of theta which will always output 1*/
 		/*remember this adds one dummy neuron in the outermost layer as well*/
 		for(int j = 0 ; j<=arrangement[i]; j++){
+			// cout << "YAHAN3"  << endl;
 			Grid.back().push_back(neuron(j,i));
+			// cout << "YAHAN4"  << endl;
 			// cout<<"neuron created id = "<<j<<" and layer = "<<i<<endl;
 			Grid.back().back().initializeWeights(i == arrangement.size() ? 0 : arrangement[i+1]);
 		}
+		// cout << "YAHAN5"  << endl;
 		Grid[i].back().setOutput(1);
+		// cout << "YAHAN6"  << endl;
 	}
+	// cout << "DONE" << endl;
 }
 
 void neuronNetwork::feedInput(vector<int> inp, vector<int> out){
@@ -191,12 +200,14 @@ double neuronNetwork::propagateForward(){
 		for(j = 0; j<Grid[i].size()-1; j++){
 			/*set the output of this neuron using previous layer neurons*/
 			Grid[i][j].calculateAndUpdateOutput(Grid[i-1]);
+			// cout<<i<<" "<<j<<" "<<Grid[i][j].getOutput()<<" this is what i get "<<endl;
 		}
 		Grid[i][j].setOutput(1);
 	}
 	vector<neuron> &lastLayer = Grid.back();
 	double curError = 0;
-	for(int i = 0 ; i<lastLayer.size()-1; i++){
+	for(int i = 0 ; i<lastLayer.size()-1; i++) {
+		// cout<<lastLayer[i].layerId<<" "<<lastLayer[i].id<<" "<<lastLayer[i].getOutput()<<" see me"<<endl;
 		curError += (expectedOutput[i] - lastLayer[i].getOutput())*(expectedOutput[i] - lastLayer[i].getOutput());
 	}
 	return curError;
@@ -265,7 +276,6 @@ void neuronNetwork::propagateBackward_later(){
 			currentLayer[j].updateWeight(Grid[i-1]);
 		}
 	}
-
 	updateWeights();
 }
 
@@ -277,29 +287,37 @@ void neuronNetwork::updateWeights(){
 	}
 }
 
+int neuronNetwork::print(){
 
-void neuronNetwork::print(){
-
+	cout<<"net on the output neurons"<<endl;
+	for(int i = 0 ; i<Grid.back().size(); i++){
+		cout<<Grid.back()[i].net<<" ";
+	}
+	cout<<endl;
 	cout<<"Expected Output ";
 	for(int i = 0 ; i<expectedOutput.size(); i++){
 		cout<<expectedOutput[i]<<" ";
 	}
 	cout<<endl;
-
-	for(int i = 0 ; i < Grid.size() ; i++){
-		for(int j = 0 ; j < Grid[i].size(); j++){
-			Grid[i][j].myPrint();
-		}
-		cout<<endl;
-	}
-
-	cout<<endl;
-
-/*	cout<<"Current Output  ";
+	cout<<"Current Output  ";
 	for(int i = 0 ; i<expectedOutput.size(); i++){
 		cout<<Grid.back()[i].getOutput()<<" ";
 	}
-	cout<<endl;*/
+	cout<<endl;
+
+	int k = 0; 
+	for(int i = 0; i<expectedOutput.size(); i++){
+		if(abs(Grid.back()[i].getOutput() - expectedOutput[i]) < 0.2) k++;
+	}
+	if(k == expectedOutput.size()){
+		cout<<"correct"<<endl;
+		return 1;
+	}
+	else {
+		cout<<"wrong"<<endl;
+		return 0;
+	}
+	
 }
 
 vector<vector<int> > genTruthTable(int n){
@@ -320,6 +338,26 @@ vector<vector<int> > genTruthTable(int n){
 		curVal /= 2;
 	}
 	return v;
+}
+
+
+void neuronNetwork::printWeights(){
+	for(int i = 0 ; i<Grid[0].size(); i++){
+		cout<<"Neuron "<<i<<" ";
+		Grid[0][i].printWeights();
+		cout<<endl;
+		cout<<"net value is "<<Grid[0][i].net;
+		cout<<endl;
+	}
+	cout<<endl;
+	for(int i = 0 ; i<Grid[1].size(); i++){
+		cout<<"Neuron layer1 "<<i<<" ";
+		// Grid[1][i].printWeights();
+		// cout<<endl;
+		cout<<"net value is "<<Grid[1][i].net;
+		cout<<endl;
+	}
+
 }
 
 
@@ -383,252 +421,237 @@ void majorityAndParity(vector<vector<int> > & out, vector<vector<int> > & in, bo
 }
 
 
-int main(int argv, char ** argc){
-	/*Mode :
-	1 - epoch mode
-	0 - not epoch mode
-	*/
-	char type;
+// int main(int argv, char ** argc){
+// 	/*Mode :
+// 	1 - epoch mode
+// 	0 - not epoch mode
+// 	*/
 
-	sscanf(argc[1], "%lf", &mf);
-	sscanf(argc[2], "%lf", &eta);
-	sscanf(argc[3], "%c", &type);
+// 	sscanf(argc[1], "%lf", &mf);
+// 	sscanf(argc[2], "%lf", &eta);
+// 	// sscanf(argc[3], "%c", &type);
 
-	if(mf != 0){
-		mfbool = 1;
-	}else{
-		mfbool = 0;
-	}
-/*
-	cout<<"Enter the operation\n";
-	cout<<"(a) 2-input NAND\n";
-	cout<<"(b) 2-input NOR\n";
-	cout<<"(c) 2-input XOR\n";
-	cout<<"(d) 5-input Palindrome\n";
-	cout<<"(e) 5-input Majority\n";
-	cout<<"(f) 6-input Even Parity\n";
-	cout<<"(g) 7 segment display with only valid inputs\n";
-	cout<<"(h) 7 segment display with all inputs\n";*/
+// 	if(mf != 0){
+// 		mfbool = 1;
+// 	}else{
+// 		mfbool = 0;
+// 	}
 
-
-	// cin>>type;
-
-	vector<int> arrangement;
-	vector<vector<int> > input;
-	vector<vector<int> > output;
-
-	int numInputs, numOutputs;
-	double threshold;
-
-	neuronNetwork myNeuronGrid(arrangement, 0);
-
-	switch(type){
-		case 'a':
-			/*nand network*/
-			arrangement = vector<int>{2,1};
-			numInputs = 2;
-			numOutputs = 1;
-			myNeuronGrid = neuronNetwork(arrangement, 0);
-			input = vector<vector<int> >{
-				vector<int>{0,0},
-				vector<int>{0,1},
-				vector<int>{1,0},
-				vector<int>{1,1}
-			};
-			output = vector<vector<int> >{
-				vector<int>{1},
-				vector<int>{1},
-				vector<int>{1},
-				vector<int>{0}
-			};
-			threshold = 0.01;
-			break;
-
-		case 'b':
-			/*nor network*/
-			arrangement = vector<int>{2,1};
-			numInputs = 2;
-			numOutputs = 1;
-			myNeuronGrid = neuronNetwork(arrangement, 0);
-			input = vector<vector<int> >{
-				vector<int>{0,0},
-				vector<int>{0,1},
-				vector<int>{1,0},
-				vector<int>{1,1}
-			};
-			output = vector<vector<int> >{
-				vector<int>{1},
-				vector<int>{0},
-				vector<int>{0},
-				vector<int>{0}
-			};
-			threshold = 0.01;
-			break;
-
-		case 'c':
-			/*xor network*/
-			arrangement = vector<int>{2,2,1};
-			numInputs = 2;
-			numOutputs = 1;
-			myNeuronGrid = neuronNetwork(arrangement, 0);
-			input = vector<vector<int> >{
-				vector<int>{0,0},
-				vector<int>{0,1},
-				vector<int>{1,0},
-				vector<int>{1,1}
-			};
-			output = vector<vector<int> >{
-				vector<int>{0},
-				vector<int>{1},
-				vector<int>{1},
-				vector<int>{0}
-			};
-			threshold = 0.01;
-			break;
-
-		case 'd':
-			/*5 input palindrome*/
-			arrangement = vector<int>{5,2,1};
-			numInputs = 5;
-			numOutputs = 1;
-			myNeuronGrid = neuronNetwork(arrangement, 1);
-			input = genTruthTable(numInputs);
-			output = vector<vector<int> >{1<<numInputs, vector<int>{0}};
-			output[0]= vector<int>{1};
-			output[10]= vector<int>{1};
-			output[17]= vector<int>{1};
-			output[27]= vector<int>{1};
-			output[4]= vector<int>{1};
-			output[14]= vector<int>{1};
-			output[21]= vector<int>{1};
-			output[31]= vector<int>{1};
-			threshold = 0.01;
-
-			break;
-		case 'e':
-			/*5 input majority*/
-			arrangement = vector<int>{5,1};
-			numInputs = 5;
-			numOutputs = 1;
-			myNeuronGrid = neuronNetwork(arrangement, 0);
-			input = genTruthTable(numInputs);
-			output = vector<vector<int> >{1<<numInputs, vector<int>{0}};
-			majorityAndParity(output, input, true);
-			threshold = 0.01;
-			break;
-
-		case 'f':
-			/*5 input parity*/
-			arrangement  = vector<int>{5,4,1};
-			numInputs = 5;
-			numOutputs = 1;
-			myNeuronGrid = neuronNetwork(arrangement, 0);
-			input = genTruthTable(numInputs);
-			output = vector<vector<int> >{1<<numInputs, vector<int>{0}};
-			majorityAndParity(output, input, false);
-			threshold = 0.32;
-			break;
-
-		case 'g':
-			/*7 segment display*/
-			arrangement = vector<int>{7,5,4};
-			numInputs = 7;
-			numOutputs = 4;
-			myNeuronGrid = neuronNetwork(arrangement, 0);
-			input = vector<vector<int> >{
-				vector<int>{0,1,1,1,1,1,1},
-				vector<int>{0,0,0,1,1,0,0},
-				vector<int>{1,0,1,1,0,1,1},
-				vector<int>{1,0,1,1,1,1,0},
-				vector<int>{1,1,0,1,1,0,0},
-				vector<int>{1,1,1,0,1,1,0},
-				vector<int>{1,1,1,0,1,1,1},
-				vector<int>{0,0,1,1,1,0,0},
-				vector<int>{1,1,1,1,1,1,1},
-				vector<int>{1,1,1,1,1,0,0}
-			};
-			output = vector<vector<int> >{
-				vector<int>{0,0,0,0},
-				vector<int>{0,0,0,1},
-				vector<int>{0,0,1,0},
-				vector<int>{0,0,1,1},
-				vector<int>{0,1,0,0},
-				vector<int>{0,1,0,1},
-				vector<int>{0,1,1,0},
-				vector<int>{0,1,1,1},
-				vector<int>{1,0,0,0},
-				vector<int>{1,0,0,1}
-			};
-			threshold = 0.01;
-			break;
-
-		case 'h':
-			/*7 segment display*/
-			arrangement = vector<int>{7,7,4};
-			numInputs = 7;
-			numOutputs = 4;
-			myNeuronGrid = neuronNetwork(arrangement, 0);
-			input = genTruthTable(numInputs);
-			output = genOutputTable_segment(numInputs,numOutputs);
-			threshold = 4;
-			break;
-
-		case 'i':
-			/*5 input parity*/
-			arrangement  = vector<int>{4,4,1};
-			numInputs = 4;
-			numOutputs = 1;
-			myNeuronGrid = neuronNetwork(arrangement, 0);
-			input = genTruthTable(numInputs);
-			output = vector<vector<int> >{1<<numInputs, vector<int>{0}};
-			majorityAndParity(output, input, false);
-			threshold = 0.32;
-			break;
-	}
-
-	// exit(0);
+// 	cout<<"Enter the operation\n";
+// 	cout<<"(a) 2-input NAND\n";
+// 	cout<<"(b) 2-input NOR\n";
+// 	cout<<"(c) 2-input XOR\n";
+// 	cout<<"(d) 5-input Palindrome\n";
+// 	cout<<"(e) 5-input Majority\n";
+// 	cout<<"(f) 6-input Even Parity\n";
+// 	cout<<"(g) 7 segment display with only valid inputs\n";
+// 	cout<<"(h) 7 segment display with all inputs\n";
 
 
-/*TRAINING DATA*/
+// 	char type;
+// 	cin>>type;
 
-/*feed input and correct output*/
-	double totalError = 0;
-	lld numSteps = 0;
-	while(1){
-		totalError = 0;
-		for(int i = 0 ; i<input.size(); i++){
-			myNeuronGrid.feedInput(input[i], output[i]);
-			totalError += myNeuronGrid.propagateForward();
-			myNeuronGrid.propagateBackward();
-		}
-		numSteps += input.size();
-		cout<<totalError<<endl;
-		if(totalError < threshold){
-			break;
-		}
-	};
+// 	vector<int> arrangement;
+// 	vector<vector<int> > input;
+// 	vector<vector<int> > output;
 
-	if(numSteps >= 50000){
-		numSteps = 0;
-	}
+// 	int numInputs, numOutputs;
+// 	double threshold;
 
-	// cout<<"Number of steps taken = "<<numSteps<<endl;
-	cout<<numSteps<<endl;
+// 	neuronNetwork myNeuronGrid(arrangement, 0);
 
-	for(int i = 0 ; i<input.size(); i++){
-		cout<<"\n\n";
-		cout<<"input -> ";
-		for(int g = 0 ; g<input[i].size(); g++){
-			cout<<input[i][g]<<" ";
-		}
-		cout<<endl;
-		myNeuronGrid.feedInput(input[i], output[i]);
-		totalError += myNeuronGrid.propagateForward();
-		myNeuronGrid.print();
-	}
+// 	switch(type){
+// 		case 'a':
+// 			/*nand network*/
+// 			arrangement = vector<int>{2,1};
+// 			numInputs = 2;
+// 			numOutputs = 1;
+// 			myNeuronGrid = neuronNetwork(arrangement, 0);
+// 			input = vector<vector<int> >{
+// 				vector<int>{0,0},
+// 				vector<int>{0,1},
+// 				vector<int>{1,0},
+// 				vector<int>{1,1}
+// 			};
+// 			output = vector<vector<int> >{
+// 				vector<int>{1},
+// 				vector<int>{1},
+// 				vector<int>{1},
+// 				vector<int>{0}
+// 			};
+// 			threshold = 0.01;
+// 			break;
 
-	return 0;
-}
+// 		case 'b':
+// 			/*nor network*/
+// 			arrangement = vector<int>{2,1};
+// 			numInputs = 2;
+// 			numOutputs = 1;
+// 			myNeuronGrid = neuronNetwork(arrangement, 0);
+// 			input = vector<vector<int> >{
+// 				vector<int>{0,0},
+// 				vector<int>{0,1},
+// 				vector<int>{1,0},
+// 				vector<int>{1,1}
+// 			};
+// 			output = vector<vector<int> >{
+// 				vector<int>{1},
+// 				vector<int>{0},
+// 				vector<int>{0},
+// 				vector<int>{0}
+// 			};
+// 			threshold = 0.01;
+// 			break;
+
+// 		case 'c':
+// 			/*xor network*/
+// 			arrangement = vector<int>{2,2,1};
+// 			numInputs = 2;
+// 			numOutputs = 1;
+// 			myNeuronGrid = neuronNetwork(arrangement, 0);
+// 			input = vector<vector<int> >{
+// 				vector<int>{0,0},
+// 				vector<int>{0,1},
+// 				vector<int>{1,0},
+// 				vector<int>{1,1}
+// 			};
+// 			output = vector<vector<int> >{
+// 				vector<int>{0},
+// 				vector<int>{1},
+// 				vector<int>{1},
+// 				vector<int>{0}
+// 			};
+// 			threshold = 0.01;
+// 			break;
+
+// 		case 'd':
+// 			/*5 input palindrome*/
+// 			arrangement = vector<int>{5,4,1};
+// 			numInputs = 5;
+// 			numOutputs = 1;
+// 			myNeuronGrid = neuronNetwork(arrangement, 0);
+// 			input = genTruthTable(numInputs);
+// 			output = vector<vector<int> >{1<<numInputs, vector<int>{0}};
+// 			output[0]= vector<int>{1};
+// 			output[10]= vector<int>{1};
+// 			output[17]= vector<int>{1};
+// 			output[27]= vector<int>{1};
+// 			output[4]= vector<int>{1};
+// 			output[14]= vector<int>{1};
+// 			output[21]= vector<int>{1};
+// 			output[31]= vector<int>{1};
+// 			threshold = 0.01;
+
+// 		case 'e':
+// 			/*5 input majority*/
+// 			arrangement = vector<int>{5,1};
+// 			numInputs = 5;
+// 			numOutputs = 1;
+// 			myNeuronGrid = neuronNetwork(arrangement, 0);
+// 			input = genTruthTable(numInputs);
+// 			output = vector<vector<int> >{1<<numInputs, vector<int>{0}};
+// 			majorityAndParity(output, input, true);
+// 			threshold = 0.01;
+// 			break;
+
+// 		case 'f':
+// 			/*5 input parity*/
+// 			arrangement  = vector<int>{5,4,1};
+// 			numInputs = 5;
+// 			numOutputs = 1;
+// 			myNeuronGrid = neuronNetwork(arrangement, 0);
+// 			input = genTruthTable(numInputs);
+// 			output = vector<vector<int> >{1<<numInputs, vector<int>{0}};
+// 			majorityAndParity(output, input, false);
+// 			threshold = 0.32;
+// 			break;
+
+// 		case 'g':
+// 			/*7 segment display*/
+// 			arrangement = vector<int>{7,5,4};
+// 			numInputs = 7;
+// 			numOutputs = 4;
+// 			myNeuronGrid = neuronNetwork(arrangement, 0);
+// 			input = vector<vector<int> >{
+// 				vector<int>{0,1,1,1,1,1,1},
+// 				vector<int>{0,0,0,1,1,0,0},
+// 				vector<int>{1,0,1,1,0,1,1},
+// 				vector<int>{1,0,1,1,1,1,0},
+// 				vector<int>{1,1,0,1,1,0,0},
+// 				vector<int>{1,1,1,0,1,1,0},
+// 				vector<int>{1,1,1,0,1,1,1},
+// 				vector<int>{0,0,1,1,1,0,0},
+// 				vector<int>{1,1,1,1,1,1,1},
+// 				vector<int>{1,1,1,1,1,0,0}
+// 			};
+// 			output = vector<vector<int> >{
+// 				vector<int>{0,0,0,0},
+// 				vector<int>{0,0,0,1},
+// 				vector<int>{0,0,1,0},
+// 				vector<int>{0,0,1,1},
+// 				vector<int>{0,1,0,0},
+// 				vector<int>{0,1,0,1},
+// 				vector<int>{0,1,1,0},
+// 				vector<int>{0,1,1,1},
+// 				vector<int>{1,0,0,0},
+// 				vector<int>{1,0,0,1}
+// 			};
+// 			threshold = 0.01;
+// 			break;
+
+// 		case 'h':
+// 			/*7 segment display*/
+// 			arrangement = vector<int>{7,4,4};
+// 			numInputs = 7;
+// 			numOutputs = 4;
+// 			myNeuronGrid = neuronNetwork(arrangement, 0);
+// 			input = genTruthTable(numInputs);
+// 			output = genOutputTable_segment(numInputs,numOutputs);
+// 			threshold = 3.1;
+// 			break;
+// 	}
+
+
+// /*TRAINING DATA*/
+
+// /*feed input and correct output*/
+// 	double totalError = 0;
+// 	lld numSteps = 0;
+// 	while(1 && numSteps<50000){
+// 		totalError = 0;
+// 		for(int i = 0 ; i<input.size(); i++){
+// 			myNeuronGrid.feedInput(input[i], output[i]);
+// 			totalError += myNeuronGrid.propagateForward();
+// 			myNeuronGrid.propagateBackward();
+// 		}
+// 		numSteps += input.size();
+// 		// cout<<totalError<<endl;
+// 		if(totalError < threshold){
+// 			break;
+// 		}
+// 	};
+
+// 	if(numSteps >= 50000){
+// 		numSteps = 0;
+// 	}
+
+// 	// cout<<"Number of steps taken = "<<numSteps<<endl;
+// 	cout<<numSteps<<endl;
+
+// 	// for(int i = 0 ; i<input.size(); i++){
+// 	// 	cout<<"\n\n";
+// 	// 	cout<<"input -> ";
+// 	// 	for(int g = 0 ; g<input[i].size(); g++){
+// 	// 		cout<<input[i][g]<<" ";
+// 	// 	}
+// 	// 	cout<<endl;
+// 	// 	myNeuronGrid.feedInput(input[i], output[i]);
+// 	// 	totalError += myNeuronGrid.propagateForward();
+// 	// 	myNeuronGrid.print();
+// 	// }
+
+// 	return 0;
+// }
 
 
 //10.144.22.120:1997/twitterapp

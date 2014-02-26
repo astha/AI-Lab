@@ -120,6 +120,8 @@ void neuron::calculateAndUpdateOutput(vector<neuron> & previousLayer){
 	/*calculate the output using the sigmoid function i.e. 1/(1+e^(-net))*/
 	// cout<<layerId<<" and "<<id<<" net is  "<<net<<" "<<(double)1/(double)(1+pow(e,-net))<<endl;
 	this->output = 1/(1+pow(e,-net));
+	// this->output Math::Exp (flt32_t exp);
+	// this->output = (double)flt64_t Math::Exp (flt64_t exp);
 }
 
 void neuron::printWeights(){
@@ -292,25 +294,30 @@ int neuronNetwork::print(){
 		cout<<Grid.back()[i].net<<" ";
 	}
 	cout<<endl;
-	int neededIndex;
 	cout<<"Expected Output ";
 	for(int i = 0 ; i<expectedOutput.size(); i++){
-		if(expectedOutput[i] == 1) neededIndex = i;
 		cout<<expectedOutput[i]<<" ";
 	}
 	cout<<endl;
-	int maxIndex = -1;
-	int maxOutput = -100;
-	double temp;
 	cout<<"Current Output  ";
 	for(int i = 0 ; i<expectedOutput.size(); i++){
-		temp = Grid.back()[i].getOutput();
-		if(temp > maxOutput) maxIndex = i;
-		cout<<temp<<" ";
+		cout<<Grid.back()[i].getOutput()<<" ";
 	}
 	cout<<endl;
-	if(maxIndex == neededIndex) return 1;
-	else return 0;
+
+	int k = 0; 
+	for(int i = 0; i<expectedOutput.size(); i++){
+		if(abs(Grid.back()[i].getOutput() - expectedOutput[i]) < 0.2) k++;
+	}
+	if(k == expectedOutput.size()){
+		cout<<"correct"<<endl;
+		return 1;
+	}
+	else {
+		cout<<"wrong"<<endl;
+		return 0;
+	}
+	
 }
 
 vector<vector<int> > genTruthTable(int n){

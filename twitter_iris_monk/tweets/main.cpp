@@ -178,12 +178,12 @@ void testOnData();
 void trainData(){
 	numInputs = wordCount;
 	numOutputs = 3;
-	arrangement = vector<int>{numInputs,10, numOutputs};
+	arrangement = vector<int>{numInputs,4,4, numOutputs};
 	myNeuronGrid = neuronNetwork(arrangement, 1);
 
 	input.clear();
 
-	threshold = 1.5;
+	threshold = 1.2;
 	// cout<<"size of training data is "<<trainingData.size()<<endl;
 	for (int i = 0 ; i < trainingData.size(); i++){
 		input.push_back(createInputVector(trainingData[i]));
@@ -297,7 +297,7 @@ void printFeatureVectorArgvector(vector<int> myfeature, int i){
 
 	numInputs = wordCount;
 	numOutputs = 3;
-	arrangement = vector<int>{numInputs, numOutputs};
+	arrangement = vector<int>{numInputs,4,4, numOutputs};
 	myNeuronGrid = neuronNetwork(arrangement, 0);
 
 	double netVal = 0;
@@ -317,8 +317,17 @@ void printFeatureVectorArgvector(vector<int> myfeature, int i){
 
 
 void testOnData(){
-
+	int numPositive = 0;
+	int numNegative = 0;
+	int numObjective = 0;
+	int correctPositive = 0;
+	int correctNegative = 0;
+	int correctObjective = 0;
+	int numPositiveGiven = 0;
+	int numNegativeGiven = 0;
+	int numObjectiveGiven = 0;
 	testInput.clear();
+	double maximum = -20;
 	// cout<<testData.size()<<" size 0 h testData ka"<<endl;
 	for (int i = 0 ; i < testData.size(); i++){
 		testInput.push_back(createInputVector(testData[i]));
@@ -328,14 +337,55 @@ void testOnData(){
 	for(int i = 0 ; i<testInput.size(); i++){
 		myNeuronGrid.feedInput(testInput[i], testOutput[i]);
 		myNeuronGrid.propagateForward();
-		// int ones = 0;
-		// for(int j = 0 ;j<testInput[i].size(); j++){
-		// 	if(testInput[i][j])ones++;
-		// }
-		// cout<<ones<<endl;
-		correct += myNeuronGrid.print();
+
+		maximum = max(myNeuronGrid.Grid.back()[0].getOutput(), max(myNeuronGrid.Grid.back()[1].getOutput(), myNeuronGrid.Grid.back()[2].getOutput()));
+
+		if(maximum == myNeuronGrid.Grid.back()[0].getOutput()){
+			numNegativeGiven++;
+		}
+		else if(maximum == myNeuronGrid.Grid.back()[1].getOutput()){
+			numObjectiveGiven++;
+		}
+		else{
+			numPositiveGiven++;
+		}
+
+		if(myNeuronGrid.print() == 1){
+			correct +=1;
+			if(testOutput[i][0] == 1){
+				numNegative++;
+				correctNegative++;
+			}
+			else if(testOutput[i][1] == 1){
+				numObjective++;
+				correctObjective++;
+			}
+			else{
+				numPositive++;
+				correctPositive++;
+			}
+		}
+		else{
+			if(testOutput[i][0] == 1){
+				numNegative++;
+			}
+			else if(testOutput[i][1] == 1){
+				numObjective++;
+			}
+			else{
+				numPositive++;
+			}
+		}
+
+		// correct += myNeuronGrid.print();
 		cout<<"\n\n";
 	}
+	cout<<"Recall(positive) :: "<<(double)correctPositive/(double)numPositive<<endl;
+	cout<<"Recall(negative) :: "<<(double)correctNegative/(double)numNegative<<endl;
+	cout<<"Recall(objective) :: "<<(double)correctObjective/(double)numObjective<<endl;
+	cout<<"Precision(positive) :: "<<(double)correctPositive/(double)numPositiveGiven<<endl;
+	cout<<"Precision(negative) :: "<<(double)correctNegative/(double)numNegativeGiven<<endl;
+	cout<<"Precision(objective) :: "<<(double)correctObjective/(double)numObjectiveGiven<<endl;
 	cout<<"Number of correct outputs = "<<correct<<" out of "<<testInput.size()<<" tweets"<<endl;
 	// myNeuronGrid.printWeights();
 }
