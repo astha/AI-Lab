@@ -1,0 +1,38 @@
+
+#ifndef PARSER_IH
+#define PARSER_IH
+
+
+#include "ast.hh"
+#include "parser.h"
+
+
+inline void Parser::error(char const *msg)
+{
+    std::cerr << msg << '\n';
+}
+
+inline int Parser::lex()
+{
+    return d_scanner.lex();
+}
+
+inline void Parser::print()         
+{
+////////////////// cfglp print tokens ///////////////////////////////
+		d_scanner.display_token(d_token__);
+
+////////////////////////////////////////////////////////////////////
+}
+
+///////////////// Line Number /////////////////////////////////////
+
+int Parser::get_line_number()
+{
+	return d_scanner.get_scan_line_number();
+}
+
+///////////////////////////////////////////////////////////////////
+
+
+#endif
