@@ -42,15 +42,10 @@ formula:
 |
 	formula OR simple_formula {
 		string fal = "F";
-		$$ = new implies_Ast(new implies_Ast($1,new Name_Ast(fal)),new Name_Ast(fal));
+		$$ = new implies_Ast(new implies_Ast($1,new Name_Ast(fal)),$3);
 		program_Ast = $$;
 	}
-|
-	NOT simple_formula {
-		string fal = "F";
-		$$ = new implies_Ast($2,new Name_Ast(fal));
-		program_Ast = $$;
-	}
+	
 ;
 
 simple_formula:
@@ -60,6 +55,11 @@ simple_formula:
 |
 	'(' formula ')' {
 		$$ = $2;
+	}
+|
+	NOT simple_formula {
+		string fal = "F";
+		$$ = new implies_Ast($2,new Name_Ast(fal));
 	}
 ;
 

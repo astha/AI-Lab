@@ -36,12 +36,20 @@ class Ast;
 class Ast
 {
 protected:
+  int type;
 public:
+  string variable_name;
+
 	Ast();
 	~Ast();
 
 	virtual void print_ast() = 0;
 	// virtual Eval_Result & evaluate() = 0;
+  virtual int get_type() = 0;
+  virtual Ast * get_lhs_ast() = 0;
+  virtual Ast * get_rhs_ast() = 0;
+  virtual bool check_mp(Ast * reducer) = 0;
+  virtual bool same_as(Ast * duplicate) = 0;
 };
 
 extern Ast * program_Ast;
@@ -49,27 +57,38 @@ extern Ast * program_Ast;
 
 class Name_Ast:public Ast
 {
-	string variable_name;
 
 public:
+	
 	Name_Ast(string & name);
 	~Name_Ast();
 
 	void print_ast();
 	// Eval_Result & evaluate();
+  int get_type();
+  Ast * get_lhs_ast();
+  Ast * get_rhs_ast();
+  bool check_mp(Ast * reducer);
+  bool same_as(Ast * duplicate);
 };
 
 class implies_Ast:public Ast
 {
+
+
   Ast * lhs;
   Ast * rhs;
-
 public:
   implies_Ast(Ast * a1, Ast * a2);
   ~implies_Ast();
 
   void print_ast();
   // Eval_Result & evaluate();
+  int get_type();
+  Ast * get_lhs_ast();
+  Ast * get_rhs_ast();
+  bool check_mp(Ast * reducer);
+  bool same_as(Ast * duplicate);
 };
 
 #endif

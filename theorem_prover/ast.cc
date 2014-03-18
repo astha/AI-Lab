@@ -39,6 +39,7 @@ Ast::~Ast()
 //*********************
 Name_Ast::Name_Ast(string & name)
 {
+  type = 1;
 	variable_name = name;
 }
 
@@ -51,9 +52,38 @@ void Name_Ast::print_ast()
 	cout<<variable_name;
 }
 
+int Name_Ast::get_type()
+{
+  return type;
+}
+
+Ast * Name_Ast::get_rhs_ast(){
+  return NULL;
+}
+
+Ast * Name_Ast::get_lhs_ast(){
+  return NULL;
+}
+
+bool Name_Ast::check_mp(Ast * reducer){
+  return false;
+}
+
+bool Name_Ast::same_as(Ast * duplicate){
+  if(type == duplicate->get_type()){
+    return(variable_name == duplicate->variable_name);
+  }
+  else{
+    return false;
+  }
+}
+
+
+
 //*********************
 implies_Ast::implies_Ast(Ast * a1, Ast * a2)
 {
+  type = 2;
   lhs = a1;
   rhs = a2;
 }
@@ -74,6 +104,32 @@ void implies_Ast::print_ast()
   cout<<") ";
 }
 
+int implies_Ast::get_type()
+{
+  return type;
+}
+
+Ast * implies_Ast::get_rhs_ast(){
+  return rhs;
+}
+
+Ast * implies_Ast::get_lhs_ast(){
+  return lhs;
+}
+
+bool implies_Ast::check_mp(Ast * reducer){
+  if(lhs->same_as(reducer)) return true;
+  return false;
+}
+
+bool implies_Ast::same_as(Ast * duplicate){
+  if(type == duplicate->get_type()){
+    return(lhs->same_as(duplicate->get_lhs_ast()) && rhs->same_as(duplicate->get_rhs_ast()));
+  }
+  else{
+    return false;
+  }
+}
 
 // Eval_Result & Name_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer)
 // {

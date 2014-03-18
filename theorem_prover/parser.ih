@@ -20,7 +20,7 @@ inline int Parser::lex()
 inline void Parser::print()         
 {
 ////////////////// cfglp print tokens ///////////////////////////////
-		d_scanner.display_token(d_token__);
+		//d_scanner.display_token(d_token__);
 
 ////////////////////////////////////////////////////////////////////
 }

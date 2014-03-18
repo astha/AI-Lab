@@ -28,7 +28,7 @@ OBJ_GEN = scanner.o parser.o
 HEADERS_CORE = ast.hh 
 HEADERS_GEN = parser.h parser.ih parserbase.h scanner.h scanner.ih scannerbase.h
 
-OBJ = $(OBJ_GEN) $(OBJ_CORE) $(AST_OBJ)
+OBJ =  $(OBJ_GEN)  $(OBJ_CORE) $(AST_OBJ)
 HEADERS = $(HEADERS_CORE) $(HEADERS_GEN)
 
 CPP = g++
