@@ -73,7 +73,7 @@ bool generate_suggestions() {
 	// type 3
 	// ((a->F)->F)->F
 	for(int i =0 ;i<vec_size; i++){
-		suggestion = new implies_Ast(new implies_Ast(new implies_Ast(hyp_vec_temp[i],script_F), script_F), script_F);
+		suggestion = new implies_Ast(new implies_Ast(new implies_Ast(hyp_vec_temp[i],script_F), script_F), hyp_vec_temp[i]);
 		// suggestion->print_ast();
 		// 	cout<<endl;
 		if(check_already_present(suggestion)) continue;
@@ -105,6 +105,7 @@ bool generate_suggestions() {
 			}
 		}
 	}
+	return false;
 }
 
 bool check_particular_mp(Ast * a){
@@ -227,8 +228,8 @@ int main(int argc, char * argv[])
 	while(1){
 		if(temp_ast->get_type() == 1){
 			// Name ast, done
-			
-			hyp_vec.push_back(new implies_Ast(temp_ast, new Name_Ast(fal)));
+			if(!temp_ast->same_as(script_F))
+				hyp_vec.push_back(new implies_Ast(temp_ast, new Name_Ast(fal)));
 			break;
 		}
 		else{
