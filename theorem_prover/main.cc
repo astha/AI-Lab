@@ -16,6 +16,7 @@ using namespace std;
 #include "parser.h"
 
 vector<Ast*> hyp_vec;
+vector<Ast*> hyp_vec_prop;
 
 bool done;
 
@@ -27,14 +28,37 @@ bool check_particular_mp(Ast * a);
 bool apply_mod_pon();
 bool check_already_present(Ast * ast);
 
+void create_propositions_asts(){
+	set<string>::iterator it;
+	string str;
+	for(it = propositions.begin() ; it!=propositions.end(); it++){
+		str = *it;
+		hyp_vec_prop.push_back(new Name_Ast(str));
+	}
+	hyp_vec_prop.push_back(script_F);
+
+	// for(int i = 0; i<hyp_vec_prop.size(); i++){
+	// 	hyp_vec_prop[i]->print_ast();
+	// cout<<" youuouiuioiuoiui"<<endl;
+	// }
+	// exit(0);
+	
+
+}
+
 bool generate_suggestions() {
 	// type 1
 	// a->(b->a)
 	Ast * suggestion;
-	int vec_size = hyp_vec.size();
+	vector<Ast*> hyp_vec_temp = hyp_vec_prop;
+	hyp_vec_temp.insert(hyp_vec_temp.end(), hyp_vec.begin(), hyp_vec.end());
+
+	int vec_size = hyp_vec_temp.size();
 	for(int i =0 ;i<vec_size; i++){
 		for(int j =0 ;j<vec_size && j != i; j++){
-			suggestion = new implies_Ast(hyp_vec[i], new implies_Ast(hyp_vec[j], hyp_vec[i]));
+			suggestion = new implies_Ast(hyp_vec_temp[i], new implies_Ast(hyp_vec_temp[j], hyp_vec_temp[i]));
+			// suggestion->print_ast();
+			// cout<<endl;
 			if(check_already_present(suggestion)) continue;
 			if(check_particular_mp(suggestion)){
 				apply_mod_pon();
@@ -49,7 +73,9 @@ bool generate_suggestions() {
 	// type 3
 	// ((a->F)->F)->F
 	for(int i =0 ;i<vec_size; i++){
-		suggestion = new implies_Ast(new implies_Ast(new implies_Ast(hyp_vec[i],script_F), script_F), script_F);
+		suggestion = new implies_Ast(new implies_Ast(new implies_Ast(hyp_vec_temp[i],script_F), script_F), script_F);
+		// suggestion->print_ast();
+		// 	cout<<endl;
 		if(check_already_present(suggestion)) continue;
 		if(check_particular_mp(suggestion)){
 			apply_mod_pon();
@@ -65,7 +91,9 @@ bool generate_suggestions() {
 	for(int i =0 ;i<vec_size; i++){
 		for(int j =0 ;j<vec_size; j++){
 			for(int k =0 ;k<vec_size; k++){
-				suggestion = new implies_Ast(new implies_Ast(hyp_vec[i], new implies_Ast(hyp_vec[j], hyp_vec[k])), new implies_Ast(new implies_Ast(hyp_vec[i], hyp_vec[j]),new implies_Ast(hyp_vec[i], hyp_vec[k])));
+				suggestion = new implies_Ast(new implies_Ast(hyp_vec_temp[i], new implies_Ast(hyp_vec_temp[j], hyp_vec_temp[k])), new implies_Ast(new implies_Ast(hyp_vec[i], hyp_vec[j]),new implies_Ast(hyp_vec[i], hyp_vec[k])));
+			// 	suggestion->print_ast();
+			// cout<<endl;
 				if(check_already_present(suggestion)) continue;
 				if(check_particular_mp(suggestion)){
 					apply_mod_pon();
@@ -83,8 +111,8 @@ bool check_particular_mp(Ast * a){
 	char ch;
 	for(int j =0 ;j<hyp_vec.size(); j++){
 		if(hyp_vec[j]->get_type() == 2 && hyp_vec[j]->check_mp(a)){
-			cout<<"Suggestion:: ";
-			cout<<"MODUS PONENS APPLIED ON -->>  ";
+			cout<<"SUGGESTION:: ";
+			cout<<"Modus ponens can be applied on -->>  ";
 			a->print_ast();
 			cout<<" and ";
 			hyp_vec[j]->print_ast();
@@ -104,8 +132,8 @@ bool check_particular_mp(Ast * a){
 
 	for(int j =0 ;j<hyp_vec.size(); j++){
 		if(hyp_vec[j]->get_type() == 2 && a->check_mp(hyp_vec[j])){
-			cout<<"Suggestion:: ";
-			cout<<"MODUS PONENS APPLIED ON -->>  ";
+			cout<<"SUGGESTION:: ";
+			cout<<"Modus ponens can be applied on -->>  ";
 			hyp_vec[j]->print_ast();
 			cout<<" and ";
 			a->print_ast();
@@ -134,7 +162,7 @@ void print_current_hypo(){
 
 void print_current_hypo_sig(int signum){
 	signal(SIGINT, print_current_hypo_sig);
-	cout<<"\n current hypothesis set\n";
+	cout<<"\n Current hypothesis set\n";
 	for(int i = 0; i<hyp_vec.size(); i++){
 		hyp_vec[i]->print_ast();
 		cout<<endl;
@@ -156,7 +184,7 @@ bool apply_mod_pon(){
 		for(int j =0 ;j<hyp_size; j++){
 			if(hyp_vec[j]->get_type() == 2){
 				if(hyp_vec[j]->check_mp(mp_lhs) && !check_already_present(hyp_vec[j]->get_rhs_ast())){
-					cout<<"MODUS PONENS APPLIED ON -->>  ";
+					cout<<"MESSAGE:: Modus ponens applied on -->>  ";
 					mp_lhs->print_ast();
 					cout<<" and ";
 					hyp_vec[j]->print_ast();
@@ -184,6 +212,9 @@ int main(int argc, char * argv[])
 		cout<<"Cannot parse the input program"<<endl;
 		exit(0);
 	}
+	string fal = "F";
+	script_F = new Name_Ast(fal);
+	create_propositions_asts();
 	cout<<endl;
 	cout<<"TO PROVE -->>  ";
 	program_Ast->print_ast();
@@ -191,7 +222,7 @@ int main(int argc, char * argv[])
 
 	Ast * temp_ast = program_Ast;
 
-	string fal = "F";
+	
 	// create hyp vector on the lhs
 	while(1){
 		if(temp_ast->get_type() == 1){
@@ -208,7 +239,7 @@ int main(int argc, char * argv[])
 
 	done = false;
 
-	script_F = new Name_Ast(fal);
+	
 	string user_help_hyp;
 
 	FILE * fp; 

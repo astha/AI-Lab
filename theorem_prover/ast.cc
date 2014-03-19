@@ -26,9 +26,11 @@
 
 using namespace std;
 #include"ast.hh"
+#include <set>
 
 
 Ast * program_Ast;
+set<string> propositions;
 
 Ast::Ast()
 {}

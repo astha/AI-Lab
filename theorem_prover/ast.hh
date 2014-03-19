@@ -25,6 +25,7 @@
 #define AST_HH
 
 #include<string>
+#include <set>
 
 #define AST_SPACE "         "
 #define AST_NODE_SPACE "            "
@@ -53,6 +54,7 @@ public:
 };
 
 extern Ast * program_Ast;
+extern set<string> propositions;
 
 
 class Name_Ast:public Ast

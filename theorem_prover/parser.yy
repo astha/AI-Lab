@@ -67,6 +67,7 @@ variable:
 	NAME
 	{
 		$$ = new Name_Ast(*$1);
+		propositions.insert(*$1);
 		delete $1;
 	}
 ;
