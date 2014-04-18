@@ -236,7 +236,7 @@ void genTruthTable(){
 	//initialize sol'
 	srand(time(NULL));
 	for(int i = 0; i<n+1; i++){
-		soln[i] = 1;
+		soln[i] = 2;
 	}
 	twoPowN = 1<<n;
 	int curVal = twoPowN/2;
@@ -259,8 +259,17 @@ void genTruthTable(){
 }
 
 
-int main(){
-	int C = 3;
+int main(int argv, char ** argc){
+	// string s = argc[1];
+	float C = atof(argc[1]);
+	C = C;
+	// cout<<C<<endl;
+	// exit(0);
+	FILE * fp1 = fopen("outputs", "a+");
+	// cout<<C<<endl;
+
+	// exit(0);
+	// int 	C = 4;
 	cout<<"Enter the operation\n";
 	cout<<"(a) 2-input NAND\n";
 	cout<<"(b) 2-input NOR\n";
@@ -292,7 +301,8 @@ int main(){
 
 
 	char type;
-	cin>>type;
+	// cin>>type;
+	type = 'a';
 
 	switch(type){
 		case 'a':
@@ -400,10 +410,12 @@ int main(){
 		if(curBreak < 0){
 			cout<<"Solution found!!\n";
 			cout<<"Num of steps taken = "<<numSteps<<endl;
+			fprintf(fp1, "%lf %d\n", C, numSteps);
 			for(int i = 0; i<n+1; i++){
 				printf("%3d ", soln[i]);
 			}
 			cout<<endl;
+			fclose(fp1);
 			return 0;
 		}
 
@@ -415,6 +427,7 @@ int main(){
 			vector<int> vec (soln, soln + sizeof(soln) / sizeof(int) );
 			if(mySet.find(vec) != mySet.end()){
 				cout<<"Cycle detected!!\n";
+				fprintf(fp1, "%lf %d CYCLE\n", C, numSteps);
 				cout<<"Num of steps taken = "<<numSteps<<endl;
 				return 0;
 			}

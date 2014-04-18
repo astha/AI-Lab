@@ -25,6 +25,7 @@
 #define AST_HH
 
 #include<string>
+#include <fstream>
 #include <set>
 
 #define AST_SPACE "         "
@@ -44,13 +45,16 @@ public:
 	Ast();
 	~Ast();
 
-	virtual void print_ast() = 0;
+  virtual void print_ast() = 0;
+	virtual void print_ast_a(FILE * fpOut) = 0;
 	// virtual Eval_Result & evaluate() = 0;
   virtual int get_type() = 0;
   virtual Ast * get_lhs_ast() = 0;
   virtual Ast * get_rhs_ast() = 0;
   virtual bool check_mp(Ast * reducer) = 0;
   virtual bool same_as(Ast * duplicate) = 0;
+  virtual string get_string() = 0;
+  virtual int get_size() = 0;
 };
 
 extern Ast * program_Ast;
@@ -65,13 +69,17 @@ public:
 	Name_Ast(string & name);
 	~Name_Ast();
 
-	void print_ast();
+  void print_ast();
+	void print_ast_a(FILE * fpOut);
+
 	// Eval_Result & evaluate();
   int get_type();
   Ast * get_lhs_ast();
   Ast * get_rhs_ast();
   bool check_mp(Ast * reducer);
   bool same_as(Ast * duplicate);
+  string get_string();
+  int get_size();
 };
 
 class implies_Ast:public Ast
@@ -85,12 +93,15 @@ public:
   ~implies_Ast();
 
   void print_ast();
+  void print_ast_a(FILE * fpOut);
   // Eval_Result & evaluate();
   int get_type();
   Ast * get_lhs_ast();
   Ast * get_rhs_ast();
   bool check_mp(Ast * reducer);
   bool same_as(Ast * duplicate);
+  string get_string();
+  int get_size();
 };
 
 #endif

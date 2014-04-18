@@ -54,6 +54,11 @@ void Name_Ast::print_ast()
 	cout<<variable_name;
 }
 
+void Name_Ast::print_ast_a(FILE* fpOut)
+{
+  fprintf(fpOut, "%s", variable_name.c_str());
+}
+
 int Name_Ast::get_type()
 {
   return type;
@@ -80,6 +85,14 @@ bool Name_Ast::same_as(Ast * duplicate){
   }
 }
 
+string Name_Ast::get_string(){
+  return variable_name;
+}
+
+int Name_Ast::get_size(){
+  return 1;
+}
+
 
 
 //*********************
@@ -103,7 +116,17 @@ void implies_Ast::print_ast()
   if(lhs != NULL)lhs->print_ast();
   cout<<" -> ";
   if(rhs != NULL)rhs->print_ast();
-  cout<<") ";
+  cout<<")";
+}
+
+void implies_Ast::print_ast_a(FILE* fpOut)
+{
+
+  fprintf(fpOut, "(");
+  if(lhs != NULL)lhs->print_ast_a(fpOut);
+  fprintf(fpOut, " -> ");
+  if(rhs != NULL)rhs->print_ast_a(fpOut);
+  fprintf(fpOut, ")");
 }
 
 int implies_Ast::get_type()
@@ -126,6 +149,9 @@ bool implies_Ast::check_mp(Ast * reducer){
 
 bool implies_Ast::same_as(Ast * duplicate){
   if(type == duplicate->get_type()){
+    if(duplicate->get_lhs_ast() == NULL || duplicate->get_rhs_ast() == NULL){
+      return false;
+    }
     return(lhs->same_as(duplicate->get_lhs_ast()) && rhs->same_as(duplicate->get_rhs_ast()));
   }
   else{
@@ -133,7 +159,18 @@ bool implies_Ast::same_as(Ast * duplicate){
   }
 }
 
-// Eval_Result & Name_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer)
-// {
-// 	return ;
-// }
+string implies_Ast::get_string(){
+  string ret_str = "(";
+  if(lhs != NULL)ret_str += lhs->get_string();
+  ret_str += "->";
+  if(rhs != NULL)ret_str += rhs->get_string();
+  ret_str += ")";
+  return ret_str;
+}
+
+int implies_Ast::get_size(){
+  int ast_size = 0;
+  if(lhs != NULL)ast_size += lhs->get_size();
+  if(rhs != NULL)ast_size += rhs->get_size();
+  return ast_size;
+}

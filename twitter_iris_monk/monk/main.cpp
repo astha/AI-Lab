@@ -107,7 +107,7 @@ void trainData(){
 
 	numInputs = 6 ;
 	numOutputs = 2;
-	arrangement = vector<int>{numInputs,5, numOutputs};
+	arrangement = vector<int>{numInputs,17,10, numOutputs};
 	myNeuronGrid = neuronNetwork(arrangement, 1);
 
 	// input.clear();

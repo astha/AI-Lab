@@ -22,7 +22,7 @@
 ###############################################################################################
 
 AST_OBJ = ast.o
-OBJ_CORE = main.o 
+OBJ_CORE = main1.o 
 OBJ_GEN = scanner.o parser.o
 
 HEADERS_CORE = ast.hh 

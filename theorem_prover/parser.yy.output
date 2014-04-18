@@ -1,0 +1,145 @@
+
+Production Rules
+(rule precedences determined from %prec or 1st terminal between parentheses):
+1: formula ->  simple_formula
+2: formula (IMPLIES) ->  formula IMPLIES simple_formula
+3: formula (AND) ->  formula AND simple_formula
+4: formula (OR) ->  formula OR simple_formula
+5: simple_formula ->  variable
+6: simple_formula ('(') ->  '(' formula ')'
+7: simple_formula (NOT) ->  NOT simple_formula
+8: variable (NAME) ->  NAME
+9: formula_$ ->  formula
+
+
+Symbolic Terminal tokens:
+       error
+       EOF
+   257: NAME
+   258: IMPLIES
+   259: AND
+   260: OR
+   261: NOT
+    40: '('
+    41: ')'
+
+
+Grammar States: 
+State 0:
+9: formula_$ ->  . formula 
+  0:   On formula to state 1
+  1:   On simple_formula to state 2
+  2:   On variable to state 3
+  3:   On '(' to state 4
+  4:   On NOT to state 5
+  5:   On NAME to state 6
+
+
+State 1:
+9: formula_$ -> formula  . 
+2: formula -> formula  . IMPLIES simple_formula 
+3: formula -> formula  . AND simple_formula 
+4: formula -> formula  . OR simple_formula 
+  0:   On IMPLIES to state 7
+  1:   On AND to state 8
+  2:   On OR to state 9
+
+
+State 2:
+1: formula -> simple_formula  . 
+  Reduce by 1: formula -> simple_formula  . 
+
+
+State 3:
+5: simple_formula -> variable  . 
+  Reduce by 5: simple_formula -> variable  . 
+
+
+State 4:
+6: simple_formula -> '('  . formula ')' 
+  0:   On formula to state 10
+  1:   On simple_formula to state 2
+  2:   On variable to state 3
+  3:   On '(' to state 4
+  4:   On NOT to state 5
+  5:   On NAME to state 6
+
+
+State 5:
+7: simple_formula -> NOT  . simple_formula 
+  0:   On simple_formula to state 11
+  1:   On variable to state 3
+  2:   On '(' to state 4
+  3:   On NOT to state 5
+  4:   On NAME to state 6
+
+
+State 6:
+8: variable -> NAME  . 
+  Reduce by 8: variable -> NAME  . 
+
+
+State 7:
+2: formula -> formula IMPLIES  . simple_formula 
+  0:   On simple_formula to state 12
+  1:   On variable to state 3
+  2:   On '(' to state 4
+  3:   On NOT to state 5
+  4:   On NAME to state 6
+
+
+State 8:
+3: formula -> formula AND  . simple_formula 
+  0:   On simple_formula to state 13
+  1:   On variable to state 3
+  2:   On '(' to state 4
+  3:   On NOT to state 5
+  4:   On NAME to state 6
+
+
+State 9:
+4: formula -> formula OR  . simple_formula 
+  0:   On simple_formula to state 14
+  1:   On variable to state 3
+  2:   On '(' to state 4
+  3:   On NOT to state 5
+  4:   On NAME to state 6
+
+
+State 10:
+6: simple_formula -> '(' formula  . ')' 
+2: formula -> formula  . IMPLIES simple_formula 
+3: formula -> formula  . AND simple_formula 
+4: formula -> formula  . OR simple_formula 
+  0:   On ')' to state 15
+  1:   On IMPLIES to state 7
+  2:   On AND to state 8
+  3:   On OR to state 9
+
+
+State 11:
+7: simple_formula -> NOT simple_formula  . 
+  Reduce by 7: simple_formula -> NOT simple_formula  . 
+
+
+State 12:
+2: formula -> formula IMPLIES simple_formula  . 
+  Reduce by 2: formula -> formula IMPLIES simple_formula  . 
+
+
+State 13:
+3: formula -> formula AND simple_formula  . 
+  Reduce by 3: formula -> formula AND simple_formula  . 
+
+
+State 14:
+4: formula -> formula OR simple_formula  . 
+  Reduce by 4: formula -> formula OR simple_formula  . 
+
+
+State 15:
+6: simple_formula -> '(' formula ')'  . 
+  Reduce by 6: simple_formula -> '(' formula ')'  . 
+
+
+
